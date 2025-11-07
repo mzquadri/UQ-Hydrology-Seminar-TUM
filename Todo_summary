@@ -1,0 +1,99 @@
+1) Function for efficienca metrics: 
+NSE 
+Input: 
+- observed discharge (aa_run_model: diso - row: 51)
+- simulated discharge (aa_run_model: diss - row: 128)
+
+NSE = 1 - (sum(obs_i - sim_i)^2)/(sum(obs_i - mean(Obs))^2)
+
+Output:
+- NSE value 
+(very good: 0.75 < NSE<= 1; 
+good: 0.65 < NSE <= 0.75; 
+satisfactory: 0.5 < NSE <=0.65; 
+unsatisfactory: NSE <= 0.5)
+
+2) Function: objective function NSE: 
+OBJ_(NSE) = 1 - NSE
+(best value: 0)
+
+3) define model Parameter Boundaries (I double checked – they are good like this)
+(don't Clip Boundaries):
+Snw_dth (0.00, 0.00)  -> value stays the same. Can be included or excluded from the optimization parameters, but is needed as input for the model.
+# Bounds for optimized subset (corrected, excluding snw_dth)
+bounds_opt = [
+(-2.0, 3.0), # snw_att
+(0.0, 3.0), # snw_pmf
+(0.0, 10.0), # snw_amf
+(0.0, 100.0), # sl0_dth
+(5.0, 700.0), # sl0_pwp
+(100.0, 700.0), # sl0_fcy
+(0.01, 10.0), # sl0_bt0
+(0.0, 20.0), # urr_dth
+(0.0, 100.0), # lrr_dth
+(0.0, 1.0), # urr_wsr
+(0.0, 1.0), # urr_ulc
+(0.0, 200.0), # urr_tdh
+(0.01, 1.0), # urr_tdr
+(0.0, 1.0), # urr_ndr
+(0.0, 1.0), # urr_uct
+(0.0, 1.0), # lrr_dre
+(0.0, 1.0), # lrr_dct
+]
+
+4) stating values for the optimization:
+# Starting parameters (optimized subset only; snw_dth is fixed separately)
+prms0_opt = np.array([
+-2.0, # snw_att
+0.00, # snw_pmf
+0.00, # snw_amf
+0.00, # sl0_dth
+5.0, # sl0_pwp
+100.0, # sl0_fcy
+0.01, # sl0_bt0
+0.00, # urr_dth
+0.00, # lrr_dth
+0.00, # urr_wsr
+0.00, # urr_ulc
+0.00, # urr_tdh
+0.01, # urr_tdr
+0.00, # urr_ndr
+0.00, # urr_uct
+0.00, # lrr_dre
+0.00, # lrr_dct
+], dtype=np.float32)
+
+5) optimization scheme: differential_evolution (SciPy)
+de_result = differential_evolution(
+func=recorder,  	must include model Parmeter, Bounderes of Model Parameter, the objective function NSE and the model (HBV)
+bounds=bounds_opt,
+strategy='best1bin',
+maxiter=50, #as start ↑ more generations (maybe up to 200)
+popsize=8,
+tol=1e-3, 	( or delete?)
+atol=1e-3,
+mutation=(0.5, 1.0),
+recombination=0.7,
+seed=None, # allow randomness for global search
+init='sobol', # better space-filling init – or back to default: ‘latinhypercube’? 
+callback=recorder.callback,
+polish=False,
+disp=True,	is that needed? 
+updating='deferred',   ? or is ir 'immediate’ ? 
+workers=1 # sequential to keep logging simple/reliable
+)
+
+Or maybe keep it more simple (some of those inputs are optional)
+de_result = differential_evolution(
+func=recorder,	must include model Parmeter, Bounderes of Model Parameter, the objective function NSE and the model (HBV) 	
+bounds=bounds_opt,
+strategy='best1bin',
+maxiter=50,  #as start ↑ more generations (maybe up to 200)
+popsize=8,
+atol=1e-3,
+seed=None, # allow randomness for global search
+init='sobol', # better space-filling init  – or back to default: ‘latinhypercube’? 
+callback=recorder.callback,
+polish=False,
+disp=True, 	is that needed?
+)
