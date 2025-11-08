@@ -100,6 +100,8 @@ polish=False,
 disp=True, 	is that needed?
 )
 
+function overwrite Interation values -> for the plots we Need to copy/ save those
+
 6)
  plots:
 model parameter names not 0...17, but snw_att,...
@@ -110,7 +112,7 @@ y-axis: model Parameters
 + Show Input boundaries of model Parameters 
 
 
-5.2) for each model Parameter plot (separate plots for each parameter) development of values to number of Iteration (of the optimization scheme) 
+6.2) for each model Parameter plot (separate plots for each parameter) development of values to number of Iteration (of the optimization scheme) 
 y-axis: Iteration
 
 6.3) plot scatter for each model Parameter (from the optimization scheme process)
