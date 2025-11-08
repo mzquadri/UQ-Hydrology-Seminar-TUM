@@ -67,7 +67,7 @@ prms0_opt = np.array([
 
 5) optimization scheme: differential_evolution (SciPy)
 de_result = differential_evolution(
-func=recorder,  	must include model Parmeter, Bounderes of Model Parameter, the objective function NSE and the model (HBV)
+func=recorder,  	must include model Parmeter, Bounderes of Model Parameter, the objective function NSE and the model (HBV) + all the model needs to run
 bounds=bounds_opt,
 strategy='best1bin',
 maxiter=50, #as start ↑ more generations (maybe up to 200)
@@ -87,7 +87,7 @@ workers=1 # sequential to keep logging simple/reliable
 
 Or maybe keep it more simple (some of those inputs are optional)
 de_result = differential_evolution(
-func=recorder,	must include model Parmeter, Bounderes of Model Parameter, the objective function NSE and the model (HBV) 	
+func=recorder,	must include model Parmeter, Bounderes of Model Parameter, the objective function NSE and the model (HBV) + all the model needs to run
 bounds=bounds_opt,
 strategy='best1bin',
 maxiter=50,  #as start ↑ more generations (maybe up to 200)
