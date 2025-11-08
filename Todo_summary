@@ -1,3 +1,5 @@
+float 32 should be enough
+
 1) Function for efficienca metrics: 
 NSE 
 Input: 
@@ -102,7 +104,7 @@ disp=True, 	is that needed?
  plots:
 model parameter names not 0...17, but snw_att,...
 
-5.1) all model Parameters in 1 plot with finial best values from optimization: 
+6.1) all model Parameters in 1 plot with finial best values from optimization: 
 x-axis: normalized values 
 y-axis: model Parameters 
 + Show Input boundaries of model Parameters 
@@ -111,7 +113,7 @@ y-axis: model Parameters
 5.2) for each model Parameter plot (separate plots for each parameter) development of values to number of Iteration (of the optimization scheme) 
 y-axis: Iteration
 
-5.3) plot scatter for each model Parameter (from the optimization scheme process)
+6.3) plot scatter for each model Parameter (from the optimization scheme process)
 x-axis: model Parameter value 
 y-axis: objective function
 the things I did understand, so far, 
@@ -120,11 +122,11 @@ is that we need to cut off Parameters lower than 0 (show only the Paramteres in 
 (so normalization was wrong here) 
 and use a log scale for the plot
 
-5.4) plot convergence (Minimum, maximum, median, running Minimum (best)):
+6.4) plot convergence (Minimum, maximum, median, running Minimum (best)):
 x-axis: objective function
 y-axis: population Iteration
 
-5.5) Integrate the two plots Fazain's model is showing (discharge and the one with the temperature, precipitation, …)
+6.5) Integrate the two plots Fazain's model is showing (discharge and the one with the temperature, precipitation, …)
 
 General: with the plots I’m not 100 % sure about everything – so we need to do maybe next week some more changes. I’m sorry about that. 
 
