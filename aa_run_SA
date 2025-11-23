@@ -23,7 +23,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from optimazation_func import nse
 
 from hmg import HBV001A
 
@@ -53,8 +52,6 @@ def obj_nse(obs, sim):
     Objective to minimize: 1 - NSE. If NSE undefined, return PENALTY.
     """
     val = nse(obs, sim)
-    if not np.isfinite(val):
-        return PENALTY
     return 1.0 - float(val)
 
 def plot_diss(inp_dfe, diso, diss, out_dir, change):
