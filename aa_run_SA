@@ -47,11 +47,22 @@ def nse(obs, sim):
     num = np.sum((s - o) ** np.float32(2.0), dtype=np.float32)
     return float(np.float32(1.0) - num / denom)
 
+def obj_nse_pzt(obj_nse, y0):
+    """
+    Objective to minimize: 1 - NSE. If NSE undefined, return PENALTY.
+    """
+
+    dta_y = obj_nse - y0
+    dta_y_pzt = (dta_y / y0) * 100
+    
+    return dta_y_pzt
+
 def obj_nse(obs, sim):
     """
     Objective to minimize: 1 - NSE. If NSE undefined, return PENALTY.
     """
     val = nse(obs, sim)
+    
     return 1.0 - float(val)
 
 def plot_diss(inp_dfe, diso, diss, out_dir, change):
@@ -182,11 +193,38 @@ def plot_param_scatter(X, Y, out_dir, param_names):
     # X: raw parameter values; Y: normalized objective
     ax.scatter(X, Y, s=10, alpha=0.6)
             
-    #ax.set_xscale('log')
-    ax.set_yscale('log')
-    ax.set_xlabel(f'{param_names} value')
-    ax.set_ylabel('Objective function value (0 = best, 1 = worst)')
-    ax.set_title(f'{param_names}: sampled values vs objective function')
+    #ax.set_yscale('log')
+    ax.set_xlabel(f'{param_names}: rel. value change in [%]')
+    ax.set_ylabel('rel. change of Objective function value in [%]')
+    ax.set_title(f'relative sampled values change vs relative objective function change')
+    ax.grid(True)
+        
+    # lock y-range to [0, 1] explicitly
+    #ax.set_ylim(0.0, 1.0)
+
+    plt.tight_layout()
+    fig.savefig(os.path.join(out_dir, f'param_scatter_{param_names}.png'))
+    plt.close(fig)
+    #===========================================================================
+    
+def plot_param_scatter_T(X, Y, out_dir, param_names):
+    """
+    Scatter plots for each parameter:
+      - X-axis: raw parameter values (original scale from bounds)
+      - Y-axis: normalized objective values (0 = best, 1 = worst)
+    """
+    if len(X) == 0:
+        return
+    
+    fig, ax = plt.subplots(figsize=(6, 4), dpi=120)
+
+    # X: raw parameter values; Y: normalized objective
+    ax.scatter(X, Y, s=10, alpha=0.6)
+            
+    #ax.set_yscale('log')
+    ax.set_xlabel(f'{param_names}: value change in Temperature [K]')
+    ax.set_ylabel('rel. change of Objective function value in [%]')
+    ax.set_title(f'relative sampled values change vs relative objective function change')
     ax.grid(True)
         
     # lock y-range to [0, 1] explicitly
@@ -228,7 +266,7 @@ def main():
     'sl0_dth', 'sl0_pwp', 'sl0_fcy', 'sl0_bt0',
     'urr_dth', 'lrr_dth', 'urr_wsr', 'urr_ulc',
     'urr_tdh', 'urr_tdr', 'urr_ndr', 'urr_uct',
-    'lrr_dre', 'lrr_dct'
+    'lrr_dre', 'lrr_lct'
     ]
     
     bounds_opt = [
@@ -307,6 +345,8 @@ def main():
             prms_mis_10.append(max(prms[i] - 1, bounds_opt[i][0]))
             prms_pls_30.append(min(prms[i] + 3, bounds_opt[i][1]))
             prms_mis_30.append(max(prms[i] - 3, bounds_opt[i][0]))
+            
+    
     
     
     cne_mis_10_to_20 =[]
@@ -335,6 +375,25 @@ def main():
             cne_pls_20_to_30.append(True)
         else:
             cne_pls_20_to_30.append(False)
+            
+    act_dir = Path(r'D:\Portable_Python_Setup\EclipsePortable426\Data\workspace\TEST_Codes\math_methods\hmg\test')
+   
+    out_dir = act_dir / 'plot' / 'SA'
+    out_dir.mkdir(parents=True, exist_ok=True)
+            
+    with open(out_dir/'summary_outside_boundaries.txt', 'w') as txt_hdl:
+        txt_hdl.write(f'{cne_mis_10_to_20};\n'\
+                     f'{cne_mis_20_to_30};\n'\
+                     f'{cne_pls_10_to_20};\n'
+                     f'{cne_pls_20_to_30};\n')
+    
+    with open(out_dir/'summary_value_cahnged prms.txt', 'w') as txt_hdl:
+        txt_hdl.write(f'-30%: {prms_mis_30}'\
+                      f'\n-20%: {prms_mis_20}'\
+                      f'\n-10%: {prms_mis_10}'\
+                      f'\n+10%: {prms_pls_10}'\
+                      f'\n+20%: {prms_pls_20}'\
+                      f'+30%:{prms_pls_30}' )
     
     nse_mis_10 = []
     nse_mis_20 = []
@@ -373,8 +432,7 @@ def main():
     # ouputs array.
     otps_lbls = modl_objt.get_output_labels()
     
-    act_dir = Path(r'D:\Portable_Python_Setup\EclipsePortable426\Data\workspace\TEST_Codes\math_methods\hmg\test')
-
+    
     for i in range(0, 6):
         if i == 0:
             print('change parameter values + 10%:')
@@ -399,10 +457,19 @@ def main():
                 # Read the internal ouputs and simulated discharge.
                 otps = modl_objt.get_outputs()
                 diss = modl_objt.get_discharge()
-                nse_test = obj_nse(diso, diss)
-                print(f'NSE = {1-nse_test}')
+                if j == 0:
+                    nse_test_0 = obj_nse(diso, diss)
+                    print(f'NSE = {1-nse_test_0}')
+                    nse_pls_10.append(0)
+                    
+                else:
+                    nse_test = obj_nse(diso, diss)
+                    Y = obj_nse_pzt(nse_test, nse_test_0)
+                    print(f'NSE = {1-nse_test}')
+                    nse_pls_10.append(Y)
+                
                 print('')
-                nse_pls_10.append(nse_test)
+                
                 
                 plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_10_percent'))
                 plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_10_percent'))
@@ -431,9 +498,10 @@ def main():
                 otps = modl_objt.get_outputs()
                 diss = modl_objt.get_discharge()
                 nse_test = obj_nse(diso, diss)
+                Y = obj_nse_pzt(nse_test, nse_test_0)
                 print(f'NSE = {1-nse_test}')
                 print('')
-                nse_mis_10.append(nse_test)
+                nse_mis_10.append(Y)
                 
                 plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_10_percent'))
                 plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_10_percent'))
@@ -462,9 +530,10 @@ def main():
                 otps = modl_objt.get_outputs()
                 diss = modl_objt.get_discharge()
                 nse_test = obj_nse(diso, diss)
+                Y = obj_nse_pzt(nse_test, nse_test_0)
                 print(f'NSE = {1-nse_test}')
                 print('')
-                nse_pls_20.append(nse_test)
+                nse_pls_20.append(Y)
                 
                 plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_20_percent'))
                 plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_20_percent'))
@@ -493,9 +562,10 @@ def main():
                 otps = modl_objt.get_outputs()
                 diss = modl_objt.get_discharge()
                 nse_test = obj_nse(diso, diss)
+                Y = obj_nse_pzt(nse_test, nse_test_0)
                 print(f'NSE = {1-nse_test}')
                 print('')
-                nse_mis_20.append(nse_test)
+                nse_mis_20.append(Y)
                 
                 plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_20_percent'))
                 plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_20_percent'))
@@ -524,9 +594,10 @@ def main():
                 otps = modl_objt.get_outputs()
                 diss = modl_objt.get_discharge()
                 nse_test = obj_nse(diso, diss)
+                Y = obj_nse_pzt(nse_test, nse_test_0)
                 print(f'NSE = {1-nse_test}')
                 print('')
-                nse_pls_30.append(nse_test)
+                nse_pls_30.append(Y)
                 
                 plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_30_percent'))
                 plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_30_percent'))
@@ -555,9 +626,10 @@ def main():
                 otps = modl_objt.get_outputs()
                 diss = modl_objt.get_discharge()
                 nse_test = obj_nse(diso, diss)
+                Y = obj_nse_pzt(nse_test, nse_test_0)
                 print(f'NSE = {1-nse_test}')
                 print('')
-                nse_mis_30.append(nse_test)
+                nse_mis_30.append(Y)
                 
                 plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_30_percent'))
                 plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_30_percent'))
@@ -568,18 +640,32 @@ def main():
     out_dir.mkdir(parents=True, exist_ok=True)
     
     X = [-30, -20, -10, 0, 10, 20, 30]
+    X_T = [-3, -2, -1, 0, 1, 2, 3,]
    
     for i in range(0, len(prms)):
-        Y = [nse_mis_30[i],
-             nse_mis_20[i],
-             nse_mis_10[i],
-             nse_mis_10[0],
-             nse_pls_10[i],
-             nse_pls_20[i],
-             nse_pls_30[i],
-            ] 
-    
-        plot_param_scatter(X, Y, out_dir, PARAM_NAMES_OPT[i])
+        if i !=1:
+            Y = [nse_mis_30[i],
+                 nse_mis_20[i],
+                 nse_mis_10[i],
+                 nse_mis_10[0],
+                 nse_pls_10[i],
+                 nse_pls_20[i],
+                 nse_pls_30[i],
+                ] 
+        
+            plot_param_scatter(X, Y, out_dir, PARAM_NAMES_OPT[i])
+        else:
+            Y = [nse_mis_30[i],
+                 nse_mis_20[i],
+                 nse_mis_10[i],
+                 nse_mis_10[0],
+                 nse_pls_10[i],
+                 nse_pls_20[i],
+                 nse_pls_30[i],
+                ] 
+        
+            plot_param_scatter_T(X_T, Y, out_dir, PARAM_NAMES_OPT[i])
+        
     
     return
 
