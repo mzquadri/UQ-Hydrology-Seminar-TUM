@@ -17,6 +17,7 @@ import os
 import sys
 import time
 import timeit
+import math
 import traceback as tb
 from pathlib import Path
 
@@ -192,15 +193,11 @@ def plot_param_scatter(X, Y, out_dir, param_names):
 
     # X: raw parameter values; Y: normalized objective
     ax.scatter(X, Y, s=10, alpha=0.6)
-            
-    #ax.set_yscale('log')
+    
     ax.set_xlabel(f'{param_names}: rel. value change in [%]')
     ax.set_ylabel('rel. change of Objective function value in [%]')
     ax.set_title(f'relative sampled values change vs relative objective function change')
     ax.grid(True)
-        
-    # lock y-range to [0, 1] explicitly
-    #ax.set_ylim(0.0, 1.0)
 
     plt.tight_layout()
     fig.savefig(os.path.join(out_dir, f'param_scatter_{param_names}.png'))
@@ -319,88 +316,52 @@ def main():
         ], dtype=np.float32)
     #==========================================================================
     
-    # Loop through the model parameters (X)
-    prms_pls_20 = []
-    prms_mis_20 = []
-    prms_pls_10 = []
-    prms_mis_10 = []
-    prms_pls_30 = []
-    prms_mis_30 =[]
-    
-    for i in range(0, len(prms)): 
-        if i != 1:
-            hdp_vle = bounds_opt[i][1] - bounds_opt[i][0]
-            
-            prms_pls_20.append(min(prms[i] + hdp_vle*0.2, bounds_opt[i][1]))
-            prms_mis_20.append(max(prms[i] - hdp_vle*0.2, bounds_opt[i][0]))
-            prms_pls_10.append(min(prms[i] + hdp_vle*0.1, bounds_opt[i][1]))
-            prms_mis_10.append(max(prms[i] - hdp_vle*0.1, bounds_opt[i][0]))
-            prms_pls_30.append(min(prms[i] + hdp_vle*0.3, bounds_opt[i][1]))
-            prms_mis_30.append(max(prms[i] - hdp_vle*0.3, bounds_opt[i][0]))
-         
-        else:
-            prms_pls_20.append(min(prms[i] + 2, bounds_opt[i][1]))
-            prms_mis_20.append(max(prms[i] - 2, bounds_opt[i][0]))
-            prms_pls_10.append(min(prms[i] + 1, bounds_opt[i][1]))
-            prms_mis_10.append(max(prms[i] - 1, bounds_opt[i][0]))
-            prms_pls_30.append(min(prms[i] + 3, bounds_opt[i][1]))
-            prms_mis_30.append(max(prms[i] - 3, bounds_opt[i][0]))
-            
-    
-    
-    
-    cne_mis_10_to_20 =[]
-    cne_mis_20_to_30 = []
-    cne_pls_10_to_20 =[]
-    cne_pls_20_to_30 =[]
-    
-    
-    for i in range(0, len(prms)): 
-        if prms_mis_10[i] == prms_mis_20[i]:
-            cne_mis_10_to_20.append(True)
-        else:
-            cne_mis_10_to_20.append(False)
-        
-        if prms_mis_20[i] == prms_mis_30[i]:
-            cne_mis_20_to_30.append(True)
-        else:
-            cne_mis_20_to_30.append(False)
-            
-        if prms_pls_10[i] == prms_pls_20[i]:
-            cne_pls_10_to_20.append(True)
-        else:
-            cne_pls_10_to_20.append(False)
-        
-        if prms_pls_20[i] == prms_pls_30[i]:
-            cne_pls_20_to_30.append(True)
-        else:
-            cne_pls_20_to_30.append(False)
-            
     act_dir = Path(r'D:\Portable_Python_Setup\EclipsePortable426\Data\workspace\TEST_Codes\math_methods\hmg\test')
    
     out_dir = act_dir / 'plot' / 'SA'
     out_dir.mkdir(parents=True, exist_ok=True)
             
+    # Loop through the model parameters (X)
+    #==========================================================================
+    X = []
+    x = np.linspace(-30, 30, 120)
+    x_T = np.linspace(-0.25, 0.25, 120)
+ 
+    for i in range(0, len(prms)): 
+        if i != 1: # i=1 is prms: snw_att 
+            for j in np.linspace(-30, 30, 120):
+                if j < 0: 
+                    x_lpv = prms[i]*(100 + j)/100
+                    X.append(max(x_lpv,bounds_opt[i][0]))
+                    
+                else: 
+                    x_lpv = prms[i]*(100+ j)/100
+                    X.append(min(x_lpv,bounds_opt[i][1]))    
+                    
+        else:
+            for j in np.linspace(-0.25, 0.25, 120):
+            
+                x_lpv = prms[i] + j
+                if j < 0: 
+                    X.append(max(x_lpv,bounds_opt[i][0]))
+                else:
+                    X.append(min(x_lpv,bounds_opt[i][1]))  
+                
+    # document at which point the new relative calculated values exceed the parameter boundaries 
     with open(out_dir/'summary_outside_boundaries.txt', 'w') as txt_hdl:
-        txt_hdl.write(f'{cne_mis_10_to_20};\n'\
-                     f'{cne_mis_20_to_30};\n'\
-                     f'{cne_pls_10_to_20};\n'
-                     f'{cne_pls_20_to_30};\n')
+        txt_hdl.write(f'\n')
+    for i in range(0, len(prms)): 
+        with open(out_dir/'summary_outside_boundaries.txt', 'a') as txt_hdl:
+            txt_hdl.write(f'\n for {PARAM_NAMES_OPT[i]} following relative values [X] are outside the boundaries:\n')
+        for j in range(0,119):
+            if X[i*120 +j] <= bounds_opt[i][0]:
+                with open(out_dir/'summary_outside_boundaries.txt', 'a') as txt_hdl:
+                    txt_hdl.write(f'True (lower B.) index:{i*120 +j}, X: {x[j]}%, value: {X[i*120 +j]}\n')
     
-    with open(out_dir/'summary_value_cahnged prms.txt', 'w') as txt_hdl:
-        txt_hdl.write(f'-30%: {prms_mis_30}'\
-                      f'\n-20%: {prms_mis_20}'\
-                      f'\n-10%: {prms_mis_10}'\
-                      f'\n+10%: {prms_pls_10}'\
-                      f'\n+20%: {prms_pls_20}'\
-                      f'+30%:{prms_pls_30}' )
-    
-    nse_mis_10 = []
-    nse_mis_20 = []
-    nse_mis_30 = []
-    nse_pls_10 = []
-    nse_pls_20 = []
-    nse_pls_30 = []
+            elif X[i*120 +j] >= bounds_opt[i][1]:
+                with open(out_dir/'summary_outside_boundaries.txt', 'a') as txt_hdl:
+                    txt_hdl.write(f'True (upper B.) index:{i*120 +j}, X: {x[j]}%, value: {X[i*120 +j]}\n')
+            
 
     # Initiate an empty model object. To understand what each method call
     # used below is for, please take a look at the files inside models
@@ -417,7 +378,7 @@ def main():
     # Set the constant that will convert units from those of precipitation
     # to those of measured discharge.
     modl_objt.set_discharge_scaler(dslr)
-                #==========================================================================
+    #==========================================================================
             
     # Show the parameters against their names as a check.
     print('')
@@ -427,244 +388,134 @@ def main():
         print(f'{prm_lbl}:', round(prms[i], 6))
             
     print('')
-            
+    
+    # Run model with optimized parameter to generate Y_0 as reference         
     # Get a dictionary that links an output labe to its column index in the
     # ouputs array.
     otps_lbls = modl_objt.get_output_labels()
     
+    # Pass the parameters.
+    modl_objt.set_parameters(prms)
+
+    # Tell the model object that the simulation is a not an optimization.
+    modl_objt.set_optimization_flag(0)
+            
+    # Run the model for the given inputs, constants and parameters.
+    modl_objt.run_model()
+
+    # Read the internal ouputs and simulated discharge.
+    otps = modl_objt.get_outputs()
+    diss = modl_objt.get_discharge()
     
-    for i in range(0, 6):
-        if i == 0:
-            print('change parameter values + 10%:')
-            out_dir = act_dir / 'plot' / 'SA' / 'plus_10_percent'
-            out_dir.mkdir(parents=True, exist_ok=True)
+    Y_0 = obj_nse(diso, diss)
+    Y = []
+    
+    out_dir_1 = act_dir / 'plot' / 'SA'
+    out_dir_1.mkdir(parents=True, exist_ok=True)
             
-            for j in range(0, len(prms)):
-                print(f'change parameter: {PARAM_NAMES_OPT[j]}')
-                prms_cne = prms.copy()
-                prms_cne[j] = prms_pls_10[j]
-                
+    with open(out_dir_1/'summary_values_the_perc_range.txt', 'w') as txt_hdl:
+        txt_hdl.write(f'\n')
+    
+    for i in range(0, len(X)):
         
-                # Pass the parameters.
-                modl_objt.set_parameters(prms_cne)
+        j = math.floor(i/120) #to get the current parameter 
+        print(f'pars:{j+1}')
+        print(f'run: {i}')
+        prms_lpv = prms.copy()
+        prms_lpv[j] = X[i]
+        
+        # Pass the parameters.
+        modl_objt.set_parameters(prms_lpv)
 
-                # Tell the model object that the simulation is a not an optimization.
-                modl_objt.set_optimization_flag(0)
+        # Tell the model object that the simulation is a not an optimization.
+        modl_objt.set_optimization_flag(0)
             
-                # Run the model for the given inputs, constants and parameters.
-                modl_objt.run_model()
+        # Run the model for the given inputs, constants and parameters.
+        modl_objt.run_model()
 
-                # Read the internal ouputs and simulated discharge.
-                otps = modl_objt.get_outputs()
-                diss = modl_objt.get_discharge()
-                if j == 0:
-                    nse_test_0 = obj_nse(diso, diss)
-                    print(f'NSE = {1-nse_test_0}')
-                    nse_pls_10.append(0)
-                    
-                else:
-                    nse_test = obj_nse(diso, diss)
-                    Y = obj_nse_pzt(nse_test, nse_test_0)
-                    print(f'NSE = {1-nse_test}')
-                    nse_pls_10.append(Y)
-                
-                print('')
-                
-                
-                plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_10_percent'))
-                plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_10_percent'))
-                
-                prms_cne =[]
+        # Read the internal ouputs and simulated discharge.
+        otps = modl_objt.get_outputs()
+        diss = modl_objt.get_discharge()
         
-        elif i == 1: 
-            print('change parameter values - 10%:')
-            out_dir = act_dir / 'plot' / 'SA' / 'minus_10_percent'
-            out_dir.mkdir(parents=True, exist_ok=True)
-            for j in range(0, len(prms)):
-                print(f'change parameter: {PARAM_NAMES_OPT[j]}')
-                prms_cne = prms.copy()
-                prms_cne[j] = prms_mis_10[j]
-        
-                # Pass the parameters.
-                modl_objt.set_parameters(prms_cne)
-
-                # Tell the model object that the simulation is a not an optimization.
-                modl_objt.set_optimization_flag(0)
-            
-                # Run the model for the given inputs, constants and parameters.
-                modl_objt.run_model()
-
-                # Read the internal ouputs and simulated discharge.
-                otps = modl_objt.get_outputs()
-                diss = modl_objt.get_discharge()
-                nse_test = obj_nse(diso, diss)
-                Y = obj_nse_pzt(nse_test, nse_test_0)
-                print(f'NSE = {1-nse_test}')
-                print('')
-                nse_mis_10.append(Y)
+        nse_test = obj_nse(diso, diss)
+        y = obj_nse_pzt(nse_test, Y_0)
+        print(f'NSE = {1-nse_test}')
+        Y.append(y)
                 
-                plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_10_percent'))
-                plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_10_percent'))
                 
-                prms_cne =[]
-                
-        elif i == 2: 
-            print('change parameter values + 20%:')
-            out_dir = act_dir / 'plot' / 'SA' / 'plus_20_percent'
-            out_dir.mkdir(parents=True, exist_ok=True)
-            for j in range(0, len(prms)):
-                print(f'change parameter: {PARAM_NAMES_OPT[j]}')
-                prms_cne = prms.copy()
-                prms_cne[j] = prms_pls_20[j]
-        
-                # Pass the parameters.
-                modl_objt.set_parameters(prms_cne)
-
-                # Tell the model object that the simulation is a not an optimization.
-                modl_objt.set_optimization_flag(0)
-            
-                # Run the model for the given inputs, constants and parameters.
-                modl_objt.run_model()
-
-                # Read the internal ouputs and simulated discharge.
-                otps = modl_objt.get_outputs()
-                diss = modl_objt.get_discharge()
-                nse_test = obj_nse(diso, diss)
-                Y = obj_nse_pzt(nse_test, nse_test_0)
-                print(f'NSE = {1-nse_test}')
-                print('')
-                nse_pls_20.append(Y)
-                
-                plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_20_percent'))
-                plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_20_percent'))
-                
-                prms_cne =[]
-                
-        elif i == 3: 
-            print('change parameter values - 20%:')
-            out_dir = act_dir / 'plot' / 'SA' / 'minus_20_percent'
-            out_dir.mkdir(parents=True, exist_ok=True)
-            for j in range(0, len(prms)):
-                print(f'change parameter: {PARAM_NAMES_OPT[j]}')
-                prms_cne = prms.copy()
-                prms_cne[j] = prms_mis_20[j]
-        
-                # Pass the parameters.
-                modl_objt.set_parameters(prms_cne)
-
-                # Tell the model object that the simulation is a not an optimization.
-                modl_objt.set_optimization_flag(0)
-            
-                # Run the model for the given inputs, constants and parameters.
-                modl_objt.run_model()
-
-                # Read the internal ouputs and simulated discharge.
-                otps = modl_objt.get_outputs()
-                diss = modl_objt.get_discharge()
-                nse_test = obj_nse(diso, diss)
-                Y = obj_nse_pzt(nse_test, nse_test_0)
-                print(f'NSE = {1-nse_test}')
-                print('')
-                nse_mis_20.append(Y)
-                
-                plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_20_percent'))
-                plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_20_percent'))
-                
-                prms_cne =[]
-               
-        elif i == 4: 
-            print('change parameter values + 30%:')
-            out_dir = act_dir / 'plot' / 'SA' / 'plus_30_percent'
-            out_dir.mkdir(parents=True, exist_ok=True)
-            for j in range(0, len(prms)):
-                print(f'change parameter: {PARAM_NAMES_OPT[j]}')
-                prms_cne = prms.copy()
-                prms_cne[j] = prms_pls_30[j]
-        
-                # Pass the parameters.
-                modl_objt.set_parameters(prms_cne)
-
-                # Tell the model object that the simulation is a not an optimization.
-                modl_objt.set_optimization_flag(0)
-            
-                # Run the model for the given inputs, constants and parameters.
-                modl_objt.run_model()
-
-                # Read the internal ouputs and simulated discharge.
-                otps = modl_objt.get_outputs()
-                diss = modl_objt.get_discharge()
-                nse_test = obj_nse(diso, diss)
-                Y = obj_nse_pzt(nse_test, nse_test_0)
-                print(f'NSE = {1-nse_test}')
-                print('')
-                nse_pls_30.append(Y)
-                
-                plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_30_percent'))
-                plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_30_percent'))
-               
-                prms_cne =[]
-                
-        elif i == 5: 
-            print('change parameter values - 30%:')
+        if i == j*120 + 0:
+            print('-30')
             out_dir = act_dir / 'plot' / 'SA' / 'minus_30_percent'
             out_dir.mkdir(parents=True, exist_ok=True)
-            for j in range(0, len(prms)):
-                print(f'change parameter: {PARAM_NAMES_OPT[j]}')
-                prms_cne = prms.copy()
-                prms_cne[j] = prms_mis_30[j]
-        
-                # Pass the parameters.
-                modl_objt.set_parameters(prms_cne)
-
-                # Tell the model object that the simulation is a not an optimization.
-                modl_objt.set_optimization_flag(0)
+            out_dir_1 = act_dir / 'plot' / 'SA'
+            out_dir_1.mkdir(parents=True, exist_ok=True)
             
-                # Run the model for the given inputs, constants and parameters.
-                modl_objt.run_model()
+            with open(out_dir_1/'summary_values_the_perc_range.txt', 'a') as txt_hdl:
+                txt_hdl.write(f'\n'\
+                              f'-30% {PARAM_NAMES_OPT[j]}: {X[i]}')
+     
+            plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_30_percent'))
+            plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_30_percent'))
 
-                # Read the internal ouputs and simulated discharge.
-                otps = modl_objt.get_outputs()
-                diss = modl_objt.get_discharge()
-                nse_test = obj_nse(diso, diss)
-                Y = obj_nse_pzt(nse_test, nse_test_0)
-                print(f'NSE = {1-nse_test}')
-                print('')
-                nse_mis_30.append(Y)
+        elif i == j*120 + 19: 
+            print('-20')
+            out_dir = act_dir / 'plot' / 'SA' / 'minus_20_percent'
+            out_dir.mkdir(parents=True, exist_ok=True)
+     
+            plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_20_percent'))
+            plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_20_percent'))
+            
+        elif i == j*120 +39: 
+            print('-10')
+            out_dir = act_dir / 'plot' / 'SA' / 'minus_10_percent'
+            out_dir.mkdir(parents=True, exist_ok=True)
+     
+            plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_10_percent'))
+            plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_10_percent'))
                 
-                plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_30_percent'))
-                plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_minus_30_percent'))
+        elif i == j*120 +79: 
+            print('+10')
+            out_dir = act_dir / 'plot' / 'SA' / 'plus_10_percent'
+            out_dir.mkdir(parents=True, exist_ok=True)
+     
+            plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_10_percent'))
+            plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_10_percent'))
+               
+        elif i == j*120 +99: 
+            print('+20')
+            out_dir = act_dir / 'plot' / 'SA' / 'plus_20_percent'
+            out_dir.mkdir(parents=True, exist_ok=True)
+     
+            plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_20_percent'))
+            plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_20_percent'))
                 
-                prms_cne =[]
+        elif i == j*120 + 119: 
+            print('+30')
+            out_dir = act_dir / 'plot' / 'SA' / 'plus_30_percent'
+            out_dir.mkdir(parents=True, exist_ok=True)
+            
+            out_dir_1 = act_dir / 'plot' / 'SA'
+            out_dir_1.mkdir(parents=True, exist_ok=True)
+            
+            with open(out_dir_1/'summary_values_the_perc_range.txt', 'a') as txt_hdl:
+                txt_hdl.write(f'\n'\
+                              f'+30% {PARAM_NAMES_OPT[j]}: {X[i]}')
+     
+            plot_diss(inp_dfe, diso, diss, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_30_percent'))
+            plot_input(inp_dfe, otps, otps_lbls, out_dir, str(f'{PARAM_NAMES_OPT[j]}_plus_30_percent'))
+                
+        prms_lpv  = []
     #==========================================================================
     out_dir = act_dir / 'plot' / 'SA' 
     out_dir.mkdir(parents=True, exist_ok=True)
     
-    X = [-30, -20, -10, 0, 10, 20, 30]
-    X_T = [-3, -2, -1, 0, 1, 2, 3,]
    
     for i in range(0, len(prms)):
-        if i !=1:
-            Y = [nse_mis_30[i],
-                 nse_mis_20[i],
-                 nse_mis_10[i],
-                 nse_mis_10[0],
-                 nse_pls_10[i],
-                 nse_pls_20[i],
-                 nse_pls_30[i],
-                ] 
-        
-            plot_param_scatter(X, Y, out_dir, PARAM_NAMES_OPT[i])
+        if i !=1:        
+            j = i*120
+            plot_param_scatter(x, Y[j : (j + 120)], out_dir, PARAM_NAMES_OPT[i])
         else:
-            Y = [nse_mis_30[i],
-                 nse_mis_20[i],
-                 nse_mis_10[i],
-                 nse_mis_10[0],
-                 nse_pls_10[i],
-                 nse_pls_20[i],
-                 nse_pls_30[i],
-                ] 
-        
-            plot_param_scatter_T(X_T, Y, out_dir, PARAM_NAMES_OPT[i])
+            plot_param_scatter_T(x_T, Y[j : (j + 120)], out_dir, PARAM_NAMES_OPT[i])
         
     
     return
