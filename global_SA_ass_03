@@ -303,8 +303,8 @@ def main():
             
                 clm += 1
                 
-        print(A)
-        print(B)
+        #print(A)
+        #print(B)
         
         C_dfs = {}
         
@@ -314,7 +314,7 @@ def main():
             key = f'C_{i}'
             C_dfs[key] = dfe
             
-        print(C_dfs)
+        #print(C_dfs)
         
         
             
