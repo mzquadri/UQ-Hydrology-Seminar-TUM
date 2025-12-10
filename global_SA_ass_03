@@ -289,7 +289,7 @@ def main():
             for bounds in bounds_opt:
                 
                 sampler = qmc.Sobol(d=1)
-                sample = sampler.random_base2(m=2)  # based on the paper N>=500 N=2**m (rows -> number of simulations) m = 9
+                sample = sampler.random_base2(m=9)  # based on the paper N>=500 N=2**m (rows -> number of simulations)
                 lbd = bounds[0]
                 ubd = bounds[1]
                 
