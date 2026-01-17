@@ -180,9 +180,15 @@ PARAM_NAMES = [
 def load_data():
     """Load input data and reference calibration results."""
     
-    # Data paths
-    data_dir = Path(r'D:\Python Projects\hmg\data')
-    out_dir_a1 = Path(__file__).resolve().parent.parent.parent / 'outputs' / 'assignment1'
+    # Data paths - use workspace data directory
+    workspace_dir = Path(__file__).resolve().parent.parent.parent
+    data_dir = workspace_dir / 'data'
+    
+    # Fallback to old path if local data doesn't exist
+    if not data_dir.exists():
+        data_dir = Path(r'D:\Python Projects\hmg\data')
+    
+    out_dir_a1 = workspace_dir / 'outputs' / 'assignment1'
     ref_dir = Path(__file__).resolve().parent.parent / 'Assignment1' / 'results'
     
     # Load time series
