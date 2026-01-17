@@ -1,0 +1,21 @@
+======================================================================
+SOBOL SENSITIVITY ANALYSIS SUMMARY
+======================================================================
+
+Total variance V(Y): 0.055875
+Sum of S1: 0.869170
+Sum of ST: 1.053067
+Total interaction: 0.183897
+
+Top 10 most sensitive parameters:
+----------------------------------------------------------------------
+ 1. lrr_dre       ST = 0.805654
+ 2. snw_att       ST = 0.142697
+ 3. sl0_fcy       ST = 0.041462
+ 4. sl0_dth       ST = 0.039613
+ 5. sl0_bt0       ST = 0.017020
+ 6. snw_amf       ST = 0.002836
+ 7. lrr_dth       ST = 0.001567
+ 8. snw_pmf       ST = 0.001312
+ 9. urr_ulc       ST = 0.000406
+10. urr_dth       ST = 0.000380

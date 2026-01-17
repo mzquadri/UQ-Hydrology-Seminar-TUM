@@ -1,0 +1,29 @@
+HBV Model Parameter Optimization - Summary
+==================================================
+
+Best Objective (1-NSE): 0.137782
+Best NSE: 0.862218
+Total evaluations: 22032
+Generations: 80
+Population size: 16
+Random seed: 42
+
+Best parameters (in model order):
+  [ 0] snw_dth: 0.000000
+  [ 1] snw_att: 0.911041
+  [ 2] snw_pmf: 0.715388
+  [ 3] snw_amf: 0.175552
+  [ 4] sl0_dth: 66.726715
+  [ 5] sl0_pwp: 665.011841
+  [ 6] sl0_fcy: 113.605995
+  [ 7] sl0_bt0: 3.344525
+  [ 8] urr_dth: 5.551411
+  [ 9] lrr_dth: 3.671169
+  [10] urr_wsr: 0.578199
+  [11] urr_ulc: 0.719789
+  [12] urr_tdh: 101.940903
+  [13] urr_tdr: 0.983273
+  [14] urr_ndr: 0.005657
+  [15] urr_uct: 0.065038
+  [16] lrr_dre: 0.006622
+  [17] lrr_lct: 0.000544
