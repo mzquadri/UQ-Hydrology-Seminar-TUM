@@ -1,0 +1,53 @@
+Assignment – 2
+(Reference: Uncertainty quantification, Smith 2014, Book)
+
+	The code part: 
+-	Make a new python script 
+-	Use the origins script from Fizan (‘aa_run_test’) as a base 
+-	We use the same input data as before (timeseries and info about area) 
+-	Use for the prms (model parameters) our optimized values: 
+(did run with 200 generations and  popsize 15 – NSE = 0.9):
+snw_dth: 0.0
+snw_att: 0.00583200016990304
+snw_pmf: 0.4144670069217682
+snw_amf: 0.07456699758768082
+sl0_dth: 49.73184585571289
+sl0_pwp: 290.7792663574219
+sl0_fcy: 111.25737762451172
+sl0_bt0: 1.995115041732788
+urr_dth: 1.0940669775009155
+lrr_dth: 1.0537699460983276
+urr_wsr: 0.8138290047645569
+urr_ulc: 0.21266600489616394
+urr_tdh: 157.26222229003906
+urr_tdr: 0.637798011302948
+urr_ndr: 0.00044299999717622995
+urr_uct: 0.001276999944821
+lrr_dre: 0.009127999655902386
+lrr_lct: 0.00015500000154133886
+
+-	Implement a loop through the model parameters (X):
+  -	For each parameter, apply a relative change with 
+    -	1x + 20% (and maybe also: 1x + 10%, 1x +30%)
+    -	1x -20%   (and maybe also: 1x - 10%, 1x -30%)
+    -	exception: temperature (snw_att) – because of the possible negative values, no relative change can be applied. 
+
+  -	with each of those parameter changes, start a model run:
+    -	Save the plots (for discharge) 
+    -	Calculate the objective function for the NSE and record those: OFV (Y) 
+    (use the functions for NSE and obj_nse from our 1 ass. Script) 
+    [info: the OFV should always be worse than from our optimized version]
+
+-	Plot relative X and Y change scatters 
+
+Analysis part: 
+-	Rank most to least sensitive Parameters
+-	Explain why those Parm. Are sensitive 
+-	Suggest how to make the Parameter less sensitive (for that the calculations in the whole HBV001a model need to be changed – only suggested! (Otherwise to complex)
+
+Assignment – 1
+-	Calculation of the Running best Minimum needs to be checked again 
+-	Change plot for: params_evolution_per_generation. For the x-aches, don’t use the generations, but the number of model runs. For the y-axis plot, the first value of the parameter, and after that, only plot the next value if the best running minimum changes its value (lower). 
++ plot without points.
+
+-	Scatter plots: current generated a warning in the console, because of neg. Values. But we only plot values between 0 and 1 (objective function). Warning should disappear when clipping the arrays to the range [0,1] before the plot. 

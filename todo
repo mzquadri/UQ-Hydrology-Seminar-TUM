@@ -1,0 +1,50 @@
+for optimization in "aa_run_model" row: 121 set opt. flag to "1":
+modl_objt.set_optimization_flag(1)
+
+1) Function for efficienca metrics: 
+NSE 
+Input: 
+- observed discharge (aa_run_model: diso - row: 51)
+- simulated discharge (aa_run_model: diss - row: 128)
+
+Output:
+- NSE value 
+(very good: 0.75 < NSE<= 1; 
+good: 0.65 < NSE <= 0.75; 
+satisfactory: 0.5 < NSE <=0.65; 
+unsatisfactory: NSE <= 0.5)
+
+2) Function: objective function NSE: 
+OBJ_(NSE) = 1 - NSE
+(best value: 0) 
+
+3) define model Parameter Boundaries -> Input for 'differential_evolution(func, bounds)'
+
+4) optimization scheme: differential_evolution (SciPy) 
+
+- Input: func -> objective function NSE ? 
+- Bounds model Parameter 
+
+function overwrite Interation values -> for the plots we Need to copy/ save those (have a look at 5)
+
+General what Needs to happen: 
+Certain model Parameter values Need to be selected and the model Needs to be run with those. Than with the created Output (diss) the NSE and the objected function must be calculated and this Needs to be repeated until the best (global) Parameter combination is found. 
+
+5) plots:
+
+5.1) all model Parameters in 1 plot with finial best values from optimization: 
+x-axis: normalized values 
+y-axis: model Parameters 
+
++ Show Input boundaries of model Parameters 
+
+5.2) for each model Parameter plot development of values to number of Iteration (of the optimization scheme) 
+y-axis: Iteration
+
+5.3) plot scatter for each model Parameter (from the optimization scheme process)
+x-axis: model Parameter value (all that were tested doing the optimization scheme)
+y-axis: objective function
+
+5.4) plot convergence (Minimum, maximum, median, running Minimum (best)):
+x-axis: objective function
+y-axis: population Iteration
