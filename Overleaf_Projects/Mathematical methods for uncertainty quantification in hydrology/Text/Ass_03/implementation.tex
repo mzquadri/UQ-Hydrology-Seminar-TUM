@@ -1,0 +1,45 @@
+The global \ac{sa} is implemented using the Sobol method with Saltelli quasi-random sampling, as provided by the \textit{SALib} library \autocite{Saltelli.2002}. The main code structure is outlined in table~\ref{tab:code_03}.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|}
+\hline
+read input: time series and catchment area (*.csv) \\ \hline
+define \ac{mp} bounds (full range and narrow range) \\ \hline
+generate Saltelli sample matrix: $N_{\text{total}} = N \cdot (2D + 2)$ samples \\ \hline
+\begin{tabular}[c]{@{}l@{}}
+for each sample $k$: \\
+\quad -- set perturbed parameter vector $\mathbf{p}_k$ \\
+\quad -- run HBV001a and compute simulated discharge \\
+\quad -- evaluate \ac{ofv}: \ac{nse} or logNSE
+\end{tabular} \\ \hline
+compute first-order ($S_1$) and total-order ($S_T$) Sobol indices via SALib \\ \hline
+clip negative $S_1$ estimates to zero (correction for Monte Carlo noise) \\ \hline
+export indices (*.csv) and bar chart summary (*.png) \\ \hline
+\end{tabular}
+\caption{Global \ac{sa}: main code structure}
+\label{tab:code_03}
+\end{table}
+
+The Sobol indices are derived from a variance decomposition of the scalar model output $Y$:
+\begin{equation}
+    V(Y) = \sum_i V_i + \sum_{i < j} V_{ij} + \cdots
+\end{equation}
+where $V_i = \mathrm{Var}\!\left[\mathbb{E}(Y \mid p_i)\right]$ is the variance in the output explained by parameter $p_i$ alone. The two reported indices are
+\begin{equation}
+    S_{1,i} = \frac{V_i}{V(Y)}, \qquad
+    S_{T,i} = 1 - \frac{V_{\sim i}}{V(Y)},
+\end{equation}
+where $V_{\sim i}$ is the variance of the conditional expectation when all parameters \emph{except} $p_i$ are fixed. A parameter with $S_T \gg S_1$ exerts most of its influence through interactions with other parameters.\\
+
+\textbf{Parameter setup.}
+The analysis covers 17 of the 18 \acp{mp} used in Assignment~1. The parameter \texttt{snw\_dth} is excluded because its calibrated value and both bounds are 0, leaving no room for variation. In the \textit{full range} configuration, the original bounds from Assignment~1 are used. In the \textit{narrow range} configuration, the bounds are contracted to a smaller interval around the calibrated values, reducing the accessible parameter space to reflect realistic perturbations near the optimum.\\
+
+\textbf{Objective functions.}
+The same evaluation is repeated twice: once using \ac{nse} as the \ac{ofv}, and once using logNSE, defined as
+\begin{equation}
+    \text{logNSE} = 1 - \frac{\sum_t \left(\ln Q_{\text{obs},t} - \ln Q_{\text{sim},t}\right)^2}{\sum_t \left(\ln Q_{\text{obs},t} - \overline{\ln Q_{\text{obs}}}\right)^2}.
+\end{equation}
+The logarithmic transformation down-weights large peak flows and amplifies the relative contribution of low flows, making logNSE sensitive to different parts of the hydrograph than \ac{nse}.
+
+Due to finite Monte Carlo sample sizes, estimated $S_1$ values can be slightly negative. These are corrected to zero before reporting, as negative first-order indices have no physical interpretation.

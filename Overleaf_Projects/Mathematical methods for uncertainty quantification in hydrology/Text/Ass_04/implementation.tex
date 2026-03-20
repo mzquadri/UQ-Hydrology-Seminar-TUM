@@ -1,0 +1,53 @@
+The analysis is structured around two experiments: a passive evaluation in which all 2000 perturbed series are run with the reference parameter set from Assignment~1, and an active recalibration in which the model is independently re-optimised for each perturbed series. The main code structure is outlined in table~\ref{tab:code_04}.
+\vspace{0.5cm}
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|}
+\hline
+read input: time series and catchment area (*.csv) \\ \hline
+load reference parameter set from Assignment~1 \\ \hline
+generate 2000 perturbed precipitation series: $C = \mathcal{N}(1.0,\, 0.083)$\\ \hline
+compute MARC per perturbed series \\ \hline
+\begin{tabular}[c]{@{}l@{}}
+for each of the 2000 series (parallelised): \\
+\quad -- run HBV001a with reference parameters on perturbed precipitation \\
+\quad -- record OFV$_\text{ref}$ for each series
+\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}l@{}}
+for each of the 2000 series (parallelised): \\
+\quad -- recalibrate HBV001a using \ac{de} on the perturbed precipitation \\
+\quad -- record OFV$_\text{recal}$ and recalibrated parameter vector
+\end{tabular} \\ \hline
+generate precipitation CDF comparison plots \\ \hline
+generate OFV CDF comparison: reference params vs.\ recalibrated \\ \hline
+generate parameter CDFs with reference values marked \\ \hline
+generate scatter plots: MARC vs.\ OFV, and OFV$_\text{ref}$ vs.\ OFV$_\text{recal}$ \\ \hline
+\end{tabular}
+\caption{Input uncertainty analysis: main code structure}
+\label{tab:code_04}
+\end{table}
+
+\noindent\textbf{Precipitation perturbation.}
+\vspace{0.5cm}
+
+Each of the $N = 2000$ perturbed series is constructed by multiplying every precipitation value $P_t$ by an independently drawn random multiplier $C_t \sim \mathcal{N}(1.0,\, 0.083)$, where the standard deviation of $0.083$ yields approximately $5\,\%$ one-sigma noise. Negative results are set to zero, ensuring the perturbed series remains physically valid. For each series $k$, the \ac{marc} with respect to the original precipitation is computed over all non-zero reference time steps:
+\begin{equation}
+    \text{MARC}_k \;=\; \frac{1}{\left|\{t : P_t > 0\}\right|} \sum_{t:\, P_t > 0} \frac{|P_t^{(k)} - P_t|}{P_t}
+\end{equation}
+
+\vspace{0.5cm}
+\noindent\textbf{Model evaluation with reference parameters.}
+\vspace{0.5cm}
+
+All 2000 perturbed series are first evaluated using the reference parameter set calibrated in Assignment~1, without any re-optimisation. This passive experiment isolates the effect of input uncertainty alone on model performance: the resulting distribution of OFV$_\text{ref}$ values characterises how the Assignment~1 calibration generalises to slightly different precipitation inputs.\\
+
+\noindent\textbf{Recalibration.}
+\vspace{0.5cm}
+
+In the active experiment, the model is recalibrated independently for each of the 2000 perturbed series using \ac{de} with a warm-start initial population seeded around the reference parameter set. The warm start places the reference parameters as the first population member, with the remaining members drawn by applying $\pm 10\,\%$ uniform perturbations around the reference values within the defined bounds. The \ac{de} configuration uses the \texttt{best1bin} strategy, a maximum of 600 generations, and a population size multiplier of 10 (yielding 170 individuals for 17 free parameters). The fixed parameter \texttt{snw\_dth} is held at zero throughout, consistent with Assignments~1 through~3.\\
+
+\noindent\textbf{Parallelisation.}
+\vspace{0.5cm}
+
+Both the reference-parameter evaluation and the recalibration loop are parallelised over the 2000 series using \texttt{joblib}. Each series is assigned a deterministic seed derived from the master seed (42) and the series index, ensuring full reproducibility.

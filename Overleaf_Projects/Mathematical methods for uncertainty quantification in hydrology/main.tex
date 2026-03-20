@@ -1,0 +1,158 @@
+%%% Packages
+\documentclass[12pt]{scrartcl}
+\usepackage[margin=2.5cm,footskip=1cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{authblk}
+\usepackage{float}
+\usepackage{lmodern}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{lipsum}
+\usepackage{xcolor}
+\setkomafont{pageheadfoot}{\normalfont}
+\usepackage{scrlayer-scrpage}
+\usepackage{comment}
+
+\pagestyle{scrheadings}
+\clearpairofpagestyles
+\ihead{} \cehead{} \ofoot{\thepage}
+
+\usepackage{siunitx}
+\DeclareSIUnit{\week}{week}
+
+\usepackage{acro}
+\acsetup{first-style=long-short}
+\input{acronyms.tex}
+
+\usepackage[
+  backend=bibtex,
+  sorting=nyt,
+  style=apa, % choose a style compatible with bibtex
+  autocite=inline
+]{biblatex}
+
+\usepackage{csquotes}
+\addbibresource{literature.bib}
+
+% for authblk package
+\renewcommand*{\Authsep}{, }
+\renewcommand*{\Authand}{, }
+\renewcommand*{\Authands}{, }
+\renewcommand*{\Affilfont}{\footnotesize}
+
+% TUM blue
+\definecolor{TUMblue}{RGB}{0,101,189} 
+
+% remove headrule from header
+\renewcommand{\headrulewidth}{0pt} 
+% Define header
+\fancypagestyle{titlepage}
+{
+    \fancyhead[L]{\textcolor{TUMblue}{\Mathematical methods for uncertainty quantification in hydrology  \\ Chair of Hydrology and River Basin Management \\ Technical University of Munich}}    
+    \fancyhead[R]{ \includegraphics[width=20mm]{Figures/TUM_logo.png}}
+    \pagenumbering{gobble}
+}
+% switch font to helvet
+\renewcommand{\familydefault}{\sfdefault}
+% no indents 
+\setlength\parindent{0pt}
+
+%%% Title Page (Input your group information here!!)
+
+% a bit dirty but working
+\title{\vspace{3cm} project seminar - Assignments} % Replace X with your current assignment number
+
+\subtitle{\vspace{0.5cm} Report \vspace{0.5cm} Group B}  % replace N with your group number
+\date{\today{}}
+
+% input your names here
+\author[1]{Yihan Shen} % group member 1
+\author[2]{Mohd Zamin Quadri} % group member 2
+\author[3]{Christine Leers} % group member 3\\
+
+% input your emails here
+\affil[1]{yihan.shen@tum.de}
+\affil[2]{zamin.quadri@tum.de}
+\affil[3]{ge79pok@mytum.de}
+
+
+
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%% MAIN DOCUMENT BEGIN %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagenumbering{Roman}
+% create title page
+\maketitle\thispagestyle{titlepage}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\printacronyms
+\listoffigures
+\listoftables
+\newpage
+
+
+
+
+%\newpage
+
+\pagenumbering{arabic}
+
+
+\section{Introduction} 
+    \input{Text/Introduction}
+\newpage
+
+\section{Model Parameter Optimization}
+    \subsection{Motivation}
+        \input{Text/Ass_01/motivation}
+    \subsection{Implementation}
+        \input{Text/Ass_01/implementation}
+    \subsection{Results and Discussion}
+        \input{Text/Ass_01/results}
+\newpage
+
+\section{Local Sensitivity Analysis}
+    \subsection{Motivation}
+        \input{Text/Ass_02/motivation}
+    \subsection{Implementation}
+        \input{Text/Ass_02/implementation}
+    \subsection{Results and Discussion}
+        \input{Text/Ass_02/results}
+        
+\section{global Sensitivity Analysis}
+    \subsection{Motivation}
+        \input{Text/Ass_03/motivation}
+    \subsection{Implementation}
+        \input{Text/Ass_03/implementation}
+    \subsection{Results and Discussion}
+        \input{Text/Ass_03/results}
+
+\section{Input Uncertainty}
+    \subsection{Motivation}
+        \input{Text/Ass_04/motivation}
+    \subsection{Implementation}
+        \input{Text/Ass_04/implementation}
+    \subsection{Results and Discussion}
+        \input{Text/Ass_04/results}
+    
+\section{Observed Discharge Uncertainty}
+    \subsection{Motivation}
+        \input{Text/Ass_05/motivation}
+    \subsection{Implementation}
+        \input{Text/Ass_05/implemenation}
+    \subsection{Results and Discussion}
+        \input{Text/Ass_05/results}
+    
+
+\newpage
+\printbibliography
+\end{document}

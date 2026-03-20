@@ -1,0 +1,5 @@
+A conceptual hydrological model like HBV001a is controlled by a set of parameters that represent physical catchment properties in more or less abstract form. Once a parameter set has been calibrated, a natural next question is which of these parameters actually matter for model performance, and which can change substantially without the result being affected.
+
+Local \ac{sa} answers this: each parameter is perturbed on its own while all others stay fixed, so any change in the model output can be traced directly back to that one parameter. The method is fast to run and easy to interpret, though it only captures single-parameter effects and says nothing about interactions or how the model behaves further from the optimum.
+
+In this assignment, a local \ac{sa} is applied to all 18 \acp{mp} of HBV001a using the optimized parameter set from Assignment~1. The \ac{nse} is used as the output metric. The goal is to rank the parameters from most to least influential and to identify those that have no measurable effect on model performance within the calibrated configuration.

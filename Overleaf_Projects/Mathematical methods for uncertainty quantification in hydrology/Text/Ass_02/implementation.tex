@@ -1,0 +1,32 @@
+The local \ac{sa} is structured around the optimized parameter set derived in Assignment~1. The main code structure is outlined in table~\ref{tab:code_02}.
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|l|}
+\hline
+read input: time series and catchment area (*.csv) \\ \hline
+define optimized \ac{mp} set from Assignment~1 \\ \hline
+define \ac{mp} boundaries \\ \hline
+generate perturbation range: $x \in [-30\%, +30\%]$, 120 linearly spaced steps \\ \hline
+\begin{tabular}[c]{@{}l@{}}
+for each \ac{mp} $i$ and each perturbation $j$: \\
+\quad -- compute perturbed value $x_{i,j}$, clipped to parameter bounds \\
+\quad -- run HBV001a with the perturbed parameter set \\
+\quad -- compute $\Delta \text{OFV}$ relative to the reference \ac{nse} \\
+\quad -- record internal model outputs at $-30\%, -20\%, -10\%, +10\%, +20\%, +30\%$
+\end{tabular} \\ \hline
+document cases where perturbed values hit parameter boundaries \\ \hline
+generate scatter plots: relative parameter change vs.\ relative \ac{ofv} change \\ \hline
+rank \acp{mp} by sensitivity \\ \hline
+\end{tabular}
+\caption{Local \ac{sa}: main code structure}
+\label{tab:code_02}
+\end{table}
+
+For each of the 18 \acp{mp}, the perturbation is applied as a relative change to the optimized value, $x_{i,j} = p_i \cdot (1 + j/100)$, where $j$ is drawn from 120 equally spaced steps between $-30\%$ and $+30\%$. The exception is \texttt{snw\_att}, whose optimized value is close to zero; here, an absolute perturbation of $\pm 0.25\,\si{K}$ is applied instead to avoid numerical issues with relative scaling. The perturbed value is always clipped to the defined parameter bounds before the model is run.
+
+The sensitivity is quantified by the relative change in the \ac{ofv}:
+\begin{equation}
+    \Delta \text{OFV}_{i,j} \;=\; \frac{\text{OFV}_{i,j} - \text{OFV}_0}{\text{OFV}_0} \times 100\,\%
+\end{equation}
+where $\text{OFV}_0$ is the reference objective function value computed from the optimized parameter set. A large spread in $\Delta \text{OFV}$ across the perturbation range indicates a sensitive parameter, while a flat response indicates insensitivity. To rank \acp{mp} by their overall influence, the maximum absolute $\Delta \text{OFV}$ observed within the full perturbation range is used as the sensitivity score.

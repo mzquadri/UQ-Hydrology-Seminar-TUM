@@ -1,0 +1,129 @@
+Assignment 4: Model Input Uncertainty Analysis
+======================================================================
+
+Configuration:
+  Number of perturbed series: 2000
+  Perturbation: C = N(1.0, 0.083)
+  Multiplier clipping [0.75, 1.25]: True
+  Recalibration enabled: True
+  DE iterations: 600
+  DE population size: 10
+  Random seed: 42
+
+Reference Calibration (from Assignment 1):
+  Reference OFV: 0.092285
+  Reference NSE: 0.907715
+
+Results with Reference Parameters:
+  Samples below penalty threshold: 2000 / 2000
+  OFV mean: 0.092702
+  OFV std: 0.001780
+  OFV min: 0.087681
+  OFV max: 0.098999
+  OFV 5th percentile: 0.089700
+  OFV 95th percentile: 0.095688
+  NSE mean: 0.907298
+  Better than reference OFV: 834/2000 (41.7%)
+
+Results with Recalibration:
+  Samples below penalty threshold: 2000 / 2000
+  OFV mean: 0.092483
+  OFV std: 0.001938
+  OFV min: 0.082987
+  OFV max: 0.103385
+  OFV 5th percentile: 0.089376
+  OFV 95th percentile: 0.095581
+  NSE mean: 0.907517
+  Better than reference OFV: 933/2000 (46.6%)
+
+Parameter Statistics (Recalibrated):
+----------------------------------------------------------------------
+Parameter       Reference         Mean          Std       5th%      95th%
+----------------------------------------------------------------------
+snw_att           -0.0059      -0.0032       0.0191    -0.0073    -0.0055
+snw_pmf            0.5272       0.5290       0.0267     0.4946     0.5611
+snw_amf            0.0453       0.0449       0.0040     0.0387     0.0511
+sl0_dth           99.7690      99.7029       2.0148    99.5216    99.9968
+sl0_pwp          686.2941     626.9155     119.2315   383.4273   699.4515
+sl0_fcy          164.7736     164.0406       3.3153   161.0002   166.8937
+sl0_bt0            2.9587       2.9559       0.0853     2.8379     3.0781
+urr_dth            1.4961       1.7593       0.3460     1.3264     2.2448
+lrr_dth            1.0700       0.9141       1.5954     0.3563     1.2325
+urr_wsr            0.9992       0.9994       0.0030     0.9987     1.0000
+urr_ulc            0.1768       0.1706       0.0339     0.1710     0.1825
+urr_tdh           24.2047     100.2261      46.9138    30.5831   179.6861
+urr_tdr            0.8764       0.4888       0.2595     0.0353     0.9067
+urr_ndr            0.0000       0.0001       0.0009     0.0000     0.0000
+urr_uct            0.0000       0.0000       0.0002     0.0000     0.0000
+lrr_dre            0.0092       0.0171       0.0556     0.0090     0.0094
+lrr_lct            0.0000       0.0071       0.0659     0.0000     0.0000
+----------------------------------------------------------------------
+
+Mean Absolute Relative PPT Change:
+  Mean: 6.62%
+  Std: 0.14%
+  Min: 6.14%
+  Max: 7.04%
+
+======================================================================
+ASSIGNMENT QUESTIONS & ANALYSIS
+======================================================================
+
+Q1: How often did the results get better by chance (compared to reference)?
+----------------------------------------------------------------------
+  With reference parameters: 834/2000 (41.7%)
+  After recalibration: 933/2000 (46.6%)
+  Recalibration improved OFV: 1908/2000 (95.4%)
+
+Q2: How much can recalibration compensate for input uncertainty?
+----------------------------------------------------------------------
+  Reference OFV (original data): 0.0923
+  Mean OFV with reference params (perturbed): 0.0927
+  Mean OFV after recalibration (perturbed): 0.0925
+
+  Mean loss (ref params on perturbed vs original): 0.0004
+  Mean loss (recalib on perturbed vs original): 0.0002
+  Compensation (improvement from recalibration): 0.0002
+  Compensation fraction: N/A (input-induced mean loss ~ 0, ratio unstable)
+    Note: Because the perturbation caused negligible mean performance loss,
+    the improvement after recalibration (0.0002) cannot be interpreted
+    as 'compensation' for input uncertainty; it more likely reflects a better
+    optimum found by the optimizer (relative to the Assignment-1 reference)
+    and/or series-specific overfitting.
+
+  => Recalibration IMPROVES mean performance on perturbed inputs.
+  OFV 90% range (5th-95th): Reference params=0.0060, Recalibrated=0.0062
+
+Q3: Does it make sense to use input uncertainty during calibration?
+----------------------------------------------------------------------
+  Analysis:
+  - Most uncertain parameters (ranked by IQR = P95 - P5):
+    Parameter           IQR        Std      Rel.Std    Ref.Val
+    sl0_pwp        316.0242   119.2315        17.4%   686.2941
+    urr_tdh        149.1030    46.9138       193.8%    24.2047
+    sl0_fcy          5.8935     3.3153         2.0%   164.7736
+    urr_dth          0.9184     0.3460        23.1%     1.4961
+    lrr_dth          0.8762     1.5954       149.1%     1.0700
+
+  Conclusion:
+  - Input uncertainty causes significant parameter uncertainty.
+  - Accounting for input uncertainty during calibration could:
+    * Provide more robust parameter estimates
+    * Better quantify prediction uncertainty bounds
+    * Identify parameters that are most affected by input errors
+
+Q4: Difference to Oudin et al. 2006?
+----------------------------------------------------------------------
+  Oudin et al. 2006 study:
+  - Analyzed biased AND randomly corrupted inputs
+  - Used multiple rainfall-runoff models (GR4J, TOPMO, HBV)
+  - Found that model efficiency is more affected by random errors
+    than by systematic bias
+  - Showed that recalibration can partially compensate for input errors
+
+  Our analysis (Assignment 4):
+  - Uses only random perturbations C = N(1, 0.05) (no systematic bias)
+  - Single model (HBV001A)
+  - Similar findings expected: random noise affects model performance
+  - Recalibration can compensate to some extent by adjusting parameters
+

@@ -1,0 +1,15 @@
+This report covers the five assignments of the project seminar \textit{Mathematical Methods for Uncertainty Quantification in Hydrology} at TUM. Throughout all assignments, the same lumped conceptual rainfall-runoff model, HBV001a from Faizan Anwar, is applied to a short, rainfall-dominated high-flow event. Keeping the simulation period and data fixed across all assignments means that differences in results come from the method being tested, not from changes in the input.
+
+HBV001a is driven at an hourly time step by temperature, precipitation, and potential evapotranspiration. It represents snow accumulation and melt, soil moisture storage and evapotranspiration, and fast and slow runoff generation through upper and lower reservoir stores. These processes are controlled by 18 \ac{mp}.
+
+The assignments follow a progression from model calibration through several types of uncertainty analysis:
+
+\textbf{Assignment~1} establishes a reference calibration using \ac{de} with \ac{nse} as the objective. The optimized parameter set achieves \ac{nse} $= 0.908$.
+
+\textbf{Assignment~2} carries out a local \ac{sa}: each of the 18~\acp{mp} is perturbed one at a time between $-30\,\%$ and $+30\,\%$ of its optimized value while all others are held fixed. The sensitivity of model performance to each individual parameter is then recorded and ranked \autocite{Smith.2014}.
+
+\textbf{Assignment~3} moves to a global \ac{sa} using Sobol variance decomposition \autocite{Saltelli.2002}. All 17 active parameters are varied simultaneously over both the full admissible bounds and a narrow range around the calibrated values, and the analysis is repeated for both \ac{nse} and logNSE to see how the choice of objective function changes the results.
+
+\textbf{Assignment~4} looks at input uncertainty by creating 2000 randomly perturbed precipitation series with Gaussian multipliers ($C \sim \mathcal{N}(1,\,0.083)$). The model is run with these series, both using the fixed reference parameters and after full recalibration, following \textcite{Oudin.2006}.
+
+\textbf{Assignment~5} addresses uncertainty in the observed discharge, which is derived from a stage-discharge rating curve and therefore subject to measurement and structural errors. The analysis examines how this output uncertainty propagates through calibration into the estimated parameters.

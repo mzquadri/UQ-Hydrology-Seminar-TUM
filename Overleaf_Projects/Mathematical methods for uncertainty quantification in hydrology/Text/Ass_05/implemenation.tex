@@ -1,0 +1,36 @@
+To generate 2000 perturbed discharge series, a rating curve was needed to represent the observed relationship between water level and discharge. The determined function will then be used to calculate the fitting discharge based on the water level, which is randomly perturbed about \SI{\pm15}{\text{cm}}. The same implementation steps for assignment 4 are used with amendments. The input remains unchanged, while the observed discharge is perturbed according to the mentioned criteria. 
+
+\subsubsection{Fitting Curves}
+To describe the nonlinear relationship between water level (h) and discharge (Q) in hydrological data, we employ a power-law relationship as the fundamental model form with equation \ref{eq: Q_base}, which is suggested by \cite{LECOZ2014573}
+
+\begin{equation}
+     \text{Q(h)} = a\cdot(h-b)^c
+     \label{eq: Q_base}
+\end{equation}
+
+
+However, preliminary fitting results indicate that a single-segment power-law model struggles to simultaneously account for the variation characteristics of both low-water-level zones and high-water-level rapid-rise zones. Therefore, while maintaining the power-law structure, a dual-power-law model with a smooth transition was further constructed with equation \ref{eq: Q}.
+
+\begin{equation}
+     \text{Q(h)} = (1 - w)\cdot Q_1 + w \cdot Q_2
+     \label{eq: Q}
+\end{equation}
+
+\begin{equation}
+     Q_1(h) = a_1\cdot(h-b)^{c_1}
+     \label{eq: Q1}
+\end{equation}
+
+\begin{equation}
+     Q_2(h) = a_2\cdot(h-b)^{c_2}
+     \label{eq: Q2}
+\end{equation}
+
+Based on them, represent the power-law relationships corresponding to the low-water control zone with equation \ref{eq: Q1} and high-water control zone with equation \ref{eq: Q2}, respectively; the weighting function w(h) is defined using a sigmoid form (eq: \ref{eq: w}).
+
+\begin{equation}
+     w(h)=\frac{1}{1+\exp\left(-\frac{h-h_0}{s}\right)}
+     \label{eq: w}
+\end{equation}
+
+Among these, h\_0 denotes the transition center between two power-law segments, where s represents the transition width. When ($h\mathclose{\ll}h\_0$), the model is primarily controlled by Q\_1(h); when ($h\mathclose{\gg}h\_0$), the model gradually shifts to being dominated by Q\_2(h); at (h=h\_0, the weights of the two power-law segments each account for \SI{50}{\percent}. This approach avoids the abrupt slope change at the boundary point inherent in traditional hard-segmented models while preserving the hydrological interpretability of the power-law model. 

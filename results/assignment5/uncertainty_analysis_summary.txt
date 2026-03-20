@@ -1,0 +1,109 @@
+Assignment 5: Model Output Uncertainty Analysis
+======================================================================
+
+Configuration:
+  Number of perturbed series: 2000
+  Perturbation Interval for water level: [-25, 25]
+  Recalibration enabled: True
+  DE iterations: 600
+  DE population size: 10
+  Random seed: 42
+
+Reference Calibration (from Assignment 1):
+  Reference OFV: 0.092285
+  Reference NSE: 0.907715
+
+  calculated NSE: 0.899967
+Results with Reference Parameters:
+  Samples below penalty threshold: 2000 / 2000
+  OFV mean: 0.240774
+  OFV std: 0.010241
+  OFV min: 0.206522
+  OFV max: 0.272619
+  OFV 5th percentile: 0.223100
+  OFV 95th percentile: 0.257444
+  NSE mean: 0.759226
+  Better than reference OFV: 0/2000 (0.0%)
+
+Results with Recalibration:
+  Samples below penalty threshold: 2000 / 2000
+  OFV mean: 0.232215
+  OFV std: 0.011029
+  OFV min: 0.192516
+  OFV max: 0.273088
+  OFV 5th percentile: 0.213661
+  OFV 95th percentile: 0.250153
+  NSE mean: 0.767785
+  Better than reference OFV: 0/2000 (0.0%)
+
+Parameter Statistics (Recalibrated):
+----------------------------------------------------------------------
+Parameter       Reference         Mean          Std       5th%      95th%
+----------------------------------------------------------------------
+snw_att           -0.0059       0.2433       0.3084    -0.0096     0.7453
+snw_pmf            0.5272       0.5892       0.2805     0.0675     1.0127
+snw_amf            0.0453       0.0441       0.0239     0.0171     0.0815
+sl0_dth           99.7690      95.4783       9.1165    73.8950    99.9746
+sl0_pwp          686.2941     396.9388     288.9915    29.8808   699.7001
+sl0_fcy          164.7736     145.7225      11.0951   122.4420   160.7406
+sl0_bt0            2.9587       3.4838       0.7024     2.7050     5.3361
+urr_dth            1.4961       2.1872       0.5501     1.3348     3.0111
+lrr_dth            1.0700       1.0393       1.0787     0.1223     2.1212
+urr_wsr            0.9992       0.9970       0.0298     0.9953     1.0000
+urr_ulc            0.1768       0.1563       0.0426     0.1097     0.2085
+urr_tdh           24.2047      86.9716      52.6305    16.1072   176.7164
+urr_tdr            0.8764       0.4551       0.2637     0.0363     0.8942
+urr_ndr            0.0000       0.0001       0.0010     0.0000     0.0000
+urr_uct            0.0000       0.0021       0.0036     0.0000     0.0094
+lrr_dre            0.0092       0.0160       0.0485     0.0073     0.0130
+lrr_lct            0.0000       0.0058       0.0593     0.0000     0.0011
+----------------------------------------------------------------------
+
+Mean Absolute Relative DIS Change:
+  Mean: 15.54%
+  Std: 0.21%
+  Min: 14.79%
+  Max: 16.33%
+
+======================================================================
+ASSIGNMENT QUESTIONS & ANALYSIS
+======================================================================
+
+Q1: How often did the results get better by chance (compared to reference)?
+----------------------------------------------------------------------
+  With reference parameters: 0/2000 (0.0%)
+  After recalibration: 0/2000 (0.0%)
+  Recalibration improved OFV: 1513/2000 (75.7%)
+
+Q2: How much can recalibration compensate for input uncertainty?
+----------------------------------------------------------------------
+  Reference OFV (original data): 0.0923
+  Mean OFV with reference params (perturbed): 0.2408
+  Mean OFV after recalibration (perturbed): 0.2322
+
+  Mean loss (ref params on perturbed vs original): 0.1485
+  Mean loss (recalib on perturbed vs original): 0.1399
+  Compensation (improvement from recalibration): 0.0086
+  Compensation fraction: 5.76% of input-induced loss recovered
+
+  => Recalibration IMPROVES mean performance on perturbed inputs.
+  OFV 90% range (5th-95th): Reference params=0.0343, Recalibrated=0.0365
+
+Q3: Does it make sense to use input uncertainty during calibration?
+----------------------------------------------------------------------
+  Analysis:
+  - Most uncertain parameters (ranked by IQR = P95 - P5):
+    Parameter           IQR        Std      Rel.Std    Ref.Val
+    sl0_pwp        669.8193   288.9915        42.1%   686.2941
+    urr_tdh        160.6093    52.6305       217.4%    24.2047
+    sl0_fcy         38.2985    11.0951         6.7%   164.7736
+    sl0_dth         26.0796     9.1165         9.1%    99.7690
+    sl0_bt0          2.6311     0.7024        23.7%     2.9587
+
+  Conclusion:
+  - Output uncertainty causes significant parameter uncertainty.
+  - Accounting for Output uncertainty during calibration could:
+    * Provide more robust parameter estimates
+    * Better quantify prediction uncertainty bounds
+    * Identify parameters that are most affected by input errors
+
