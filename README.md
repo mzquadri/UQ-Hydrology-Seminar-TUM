@@ -266,6 +266,56 @@ SALib
 joblib
 ```
 
+Install the versioned open-source dependencies with:
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### Required course inputs
+
+The forcing, area, and HBV model inputs are course-provided and are not
+redistributed here. Assignments 1-4 additionally require the course-provided
+`hmg` package containing `HBV001A`. Obtain these materials through the
+authorized course channel before executing the scientific workflows.
+
+Set the data directory explicitly rather than editing a source file:
+
+```powershell
+$env:HYDROLOGY_DATA_DIR = "C:\path\to\authorized\hmg\data"
+```
+
+It must contain `time_series___24163005.csv` and `area___24163005.csv`.
+Assignment 5's rating-curve fitting script requires a separately authorized
+CSV and accepts its location through:
+
+```powershell
+$env:HYDROLOGY_RATING_CURVE_PATH = "C:\path\to\time_series___24163005_without_Outliers.csv"
+```
+
+The repository includes result artifacts and report sources, but the full
+scientific reruns cannot be reproduced from this repository alone without the
+course inputs and `hmg` package. The values above are versioned seminar
+results, not independently re-executed claims.
+
+### Integrity check
+
+Run the non-destructive repository check to confirm that the source, key result
+artifacts, and LaTeX report entry point are present:
+
+```bash
+python scripts/check_repository.py
+```
+
+### Windows checkout note
+
+Some report paths are long. On Windows, clone to a short path and enable Git
+long paths, for example:
+
+```powershell
+git clone --config core.longpaths=true https://github.com/mzquadri/Uncertainity-Quantification-in-Hydralogy-Project-Seminar-.git C:\g\h
+```
+
 ---
 
 ## Methodology Overview

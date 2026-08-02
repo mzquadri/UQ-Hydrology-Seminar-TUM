@@ -197,9 +197,13 @@ def load_data():
     workspace_dir = Path(__file__).resolve().parent.parent.parent
     data_dir = workspace_dir / 'data'
     
-    # Fallback to old path if local data doesn't exist
-    if not data_dir.exists():
-        data_dir = Path(r'D:\Python Projects\hmg\data')
+    data_dir = Path(os.environ.get("HYDROLOGY_DATA_DIR", data_dir))
+    if not data_dir.is_dir():
+        raise FileNotFoundError(
+            "Hydrology input data was not found. Set HYDROLOGY_DATA_DIR to an "
+            "authorized directory containing time_series___24163005.csv and "
+            "area___24163005.csv."
+        )
     
     out_dir_a1 = workspace_dir / 'outputs' / 'assignment1'
     ref_dir = Path(__file__).resolve().parent.parent / 'Assignment1' / 'results'
@@ -1461,9 +1465,13 @@ def main():
     workspace_dir = Path(__file__).resolve().parent.parent.parent
     data_dir = workspace_dir / 'data'
     
-    # Fallback to old path if local data doesn't exist
-    if not data_dir.exists():
-        data_dir = Path(r'D:\Python Projects\hmg\data')
+    data_dir = Path(os.environ.get("HYDROLOGY_DATA_DIR", data_dir))
+    if not data_dir.is_dir():
+        raise FileNotFoundError(
+            "Hydrology input data was not found. Set HYDROLOGY_DATA_DIR to an "
+            "authorized directory containing time_series___24163005.csv and "
+            "area___24163005.csv."
+        )
     
     # Load time series
     inp_dfe = pd.read_csv(data_dir / 'time_series___24163005.csv', 

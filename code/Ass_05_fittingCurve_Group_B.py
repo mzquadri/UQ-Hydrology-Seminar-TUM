@@ -1,11 +1,23 @@
+import os
+from pathlib import Path
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit, least_squares
 from sklearn.metrics import r2_score, mean_squared_error
 
-#data loading
-csv_path = r'C:\Users\chris\Documents\TUM\Master\WS25_26\Math_Meth\Ass_05\new_fitt_script\time_series___24163005_without_Outliers.csv'
+# Data is not redistributed with this academic repository. Set
+# HYDROLOGY_RATING_CURVE_PATH to the authorized semicolon-separated source file.
+csv_path = Path(os.environ.get(
+    "HYDROLOGY_RATING_CURVE_PATH",
+    Path(__file__).resolve().parent / "data" / "time_series___24163005_without_Outliers.csv",
+))
+if not csv_path.is_file():
+    raise FileNotFoundError(
+        "Rating-curve data was not found. Set HYDROLOGY_RATING_CURVE_PATH to "
+        "an authorized time_series___24163005_without_Outliers.csv file."
+    )
 df = pd.read_csv(csv_path, sep=';')
 
 h = df['ddho__ref'].to_numpy(dtype=float)

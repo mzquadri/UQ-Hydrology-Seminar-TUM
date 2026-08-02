@@ -1,0 +1,11 @@
+# Core scientific stack used by the assignment scripts.
+numpy
+pandas
+scipy
+matplotlib
+joblib
+scikit-learn
+SALib
+
+# The HBV001A implementation is imported as `hmg` by Assignments 1-4.
+# It is course-provided and not redistributed in this repository.
