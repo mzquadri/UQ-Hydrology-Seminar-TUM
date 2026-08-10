@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="940" height="560" viewBox="0 0 940 560" font-family="Segoe UI, Arial, sans-serif">
+  <rect width="940" height="560" fill="#ffffff"/>
+  <text x="470" y="34" font-size="20" font-weight="700" fill="#1e293b" text-anchor="middle">Uncertainty Quantification in Hydrology &#8212; Seminar Workflow (Group B)</text>
+
+  <rect x="300" y="58" width="340" height="64" rx="12" fill="#7c3aed"/>
+  <text x="470" y="84" font-size="15" font-weight="600" fill="#ffffff" text-anchor="middle">HBV001a (lumped rainfall-runoff)</text>
+  <text x="470" y="106" font-size="12.5" fill="#ede9fe" text-anchor="middle">hourly time step, 18 parameters</text>
+
+  <rect x="60" y="140" width="180" height="40" rx="8" fill="#ea580c"/>
+  <text x="150" y="164" font-size="12" fill="#ffffff" text-anchor="middle">Temperature</text>
+  <rect x="380" y="140" width="180" height="40" rx="8" fill="#ea580c"/>
+  <text x="470" y="164" font-size="12" fill="#ffffff" text-anchor="middle">Precipitation</text>
+  <rect x="700" y="140" width="180" height="40" rx="8" fill="#ea580c"/>
+  <text x="790" y="164" font-size="12" fill="#ffffff" text-anchor="middle">Potential evapotranspiration</text>
+
+  <path d="M150 180 L470 122" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+  <path d="M470 180 L470 122" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+  <path d="M790 180 L470 122" stroke="#94a3b8" stroke-width="1.5" fill="none"/>
+
+  <rect x="60" y="212" width="220" height="74" rx="10" fill="#2563eb"/>
+  <text x="170" y="238" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Ass. 1 &#8212; Calibration</text>
+  <text x="170" y="258" font-size="11.5" fill="#dbeafe" text-anchor="middle">Differential Evolution, NSE objective</text>
+  <text x="170" y="274" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">Best NSE = 0.908</text>
+
+  <rect x="360" y="212" width="220" height="74" rx="10" fill="#2563eb"/>
+  <text x="470" y="238" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Ass. 2 &#8212; Local SA</text>
+  <text x="470" y="258" font-size="11.5" fill="#dbeafe" text-anchor="middle">OAT perturbation, &#177;30%</text>
+  <text x="470" y="274" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">sl0_fcy dominates</text>
+
+  <rect x="660" y="212" width="220" height="74" rx="10" fill="#2563eb"/>
+  <text x="770" y="238" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Ass. 3 &#8212; Global SA</text>
+  <text x="770" y="258" font-size="11.5" fill="#dbeafe" text-anchor="middle">Sobol / Saltelli sampling</text>
+  <text x="770" y="274" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">lrr_dre ST = 0.60</text>
+
+  <path d="M280 249 L360 249" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M580 249 L660 249" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M360 249 L360 326 L360 356" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M580 249 L580 326 L580 356" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+
+  <rect x="60" y="356" width="400" height="84" rx="10" fill="#16a34a"/>
+  <text x="260" y="382" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Ass. 4 &#8212; Input (precipitation) uncertainty</text>
+  <text x="260" y="402" font-size="11.5" fill="#dcfce7" text-anchor="middle">2000 perturbed precipitation series (~5% noise)</text>
+  <text x="260" y="422" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">NSE 0.908 &#8594; 0.907 &#8212; minimal impact</text>
+
+  <rect x="480" y="356" width="400" height="84" rx="10" fill="#16a34a"/>
+  <text x="680" y="382" font-size="13.5" font-weight="600" fill="#ffffff" text-anchor="middle">Ass. 5 &#8212; Output (discharge) uncertainty</text>
+  <text x="680" y="402" font-size="11.5" fill="#dcfce7" text-anchor="middle">rating-curve errors (&#177;15 cm water level)</text>
+  <text x="680" y="422" font-size="11.5" font-weight="600" fill="#ffffff" text-anchor="middle">NSE 0.908 &#8594; 0.759 &#8212; severe impact</text>
+
+  <path d="M260 440 L260 470 L470 470 L470 500" stroke="#94a3b8" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+  <path d="M680 440 L680 470 L470 470" stroke="#94a3b8" stroke-width="2" fill="none"/>
+
+  <rect x="180" y="500" width="580" height="40" rx="20" fill="#f0f4ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="470" y="524" font-size="12.5" font-weight="600" fill="#2563eb" text-anchor="middle">Output error &gt;&gt; input error &#8212; calibration alone cannot recover rating-curve uncertainty</text>
+
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+</svg>

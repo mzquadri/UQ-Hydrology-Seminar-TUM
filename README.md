@@ -320,25 +320,9 @@ git clone --config core.longpaths=true https://github.com/mzquadri/Uncertainity-
 
 ## Methodology Overview
 
-```
-Assignment 1          Assignment 2          Assignment 3
-Calibration    --->   Local SA       --->   Global SA (Sobol)
-(DE, NSE=0.908)       (OAT, +/-30%)         (Saltelli sampling)
-     |                     |                      |
-     v                     v                      v
-  Baseline             Parameter              Interaction
-  parameters           ranking                 effects
-                       near optimum            across full space
-     |
-     +--------------------------------------------------+
-     |                                                  |
-     v                                                  v
-Assignment 4                                   Assignment 5
-Input Uncertainty                              Output Uncertainty
-(2000 precip. series)                          (Rating curve errors)
-NSE: 0.908 -> 0.907                            NSE: 0.908 -> 0.759
-(minimal impact)                               (severe impact)
-```
+![Workflow overview](docs/diagrams/workflow.svg)
+
+The seminar builds a progressive chain: a calibrated HBV001a baseline (Assignment 1), local sensitivity around the optimum (Assignment 2), global sensitivity across the full parameter space (Assignment 3), and then two uncertainty propagation studies on the same baseline -- precipitation input noise (Assignment 4) and rating-curve output error (Assignment 5). The key takeaway: output uncertainty dominates, and calibration alone cannot recover it.
 
 ---
 
