@@ -249,8 +249,8 @@ The following files are tracked with [Git Large File Storage](https://git-lfs.gi
 git lfs install
 
 # Clone the repository
-git clone https://github.com/mzquadri/Uncertainity-Quantification-in-Hydralogy-Project-Seminar-.git
-cd Uncertainity-Quantification-in-Hydralogy-Project-Seminar-
+git clone https://github.com/mzquadri/UQ-Hydrology-Seminar-TUM.git
+cd UQ-Hydrology-Seminar-TUM
 ```
 
 ### Dependencies
@@ -313,7 +313,7 @@ Some report paths are long. On Windows, clone to a short path and enable Git
 long paths, for example:
 
 ```powershell
-git clone --config core.longpaths=true https://github.com/mzquadri/Uncertainity-Quantification-in-Hydralogy-Project-Seminar-.git C:\g\h
+git clone --config core.longpaths=true https://github.com/mzquadri/UQ-Hydrology-Seminar-TUM.git C:\g\h
 ```
 
 ---
@@ -347,22 +347,19 @@ The seminar builds a progressive chain: a calibrated HBV001a baseline (Assignmen
       <a href="https://github.com/mzquadri">
         <img src="https://github.com/mzquadri.png" width="100px;" alt=""/><br/>
         <sub><b>Mohd Zamin Quadri</b></sub>
-      </a><br/>
-      <sub>zamin.quadri@tum.de</sub>
+      </a>
     </td>
     <td align="center">
       <a href="https://github.com/chrLeers">
         <img src="https://github.com/chrLeers.png" width="100px;" alt=""/><br/>
         <sub><b>Christine Leers</b></sub>
-      </a><br/>
-      <sub>ge79pok@mytum.de</sub>
+      </a>
     </td>
     <td align="center">
       <a href="https://github.com/warumso7">
         <img src="https://github.com/warumso7.png" width="100px;" alt=""/><br/>
         <sub><b>Yihan Shen</b></sub>
-      </a><br/>
-      <sub>yihan.shen@tum.de</sub>
+      </a>
     </td>
   </tr>
 </table>
