@@ -34,7 +34,11 @@ jobs:
         # submitted and is deliberately left as it was written.
         run: ruff check scripts/
 
-      - name: Required artifacts are present and the code parses
+      # Also checks that each committed figure records the result files it was
+      # drawn from and that those files are still the committed ones, which is
+      # why it runs before the step that regenerates the figures: afterwards it
+      # would be checking this runner's own output.
+      - name: Artifacts present, code parses, figures match results/
         run: python scripts/check_repository.py
 
       - name: README numbers still match the result files

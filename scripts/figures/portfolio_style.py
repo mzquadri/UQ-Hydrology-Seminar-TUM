@@ -6,8 +6,13 @@ looks like it belongs to the same report and reads on a white page.
 
 from __future__ import annotations
 
+import json
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+
+#: tEXt key holding the result files a figure was drawn from.
+INPUTS_KEY = "ResultInputs"
 
 PAPER = "#FFFFFF"
 INK = "#111827"
@@ -105,8 +110,27 @@ def note(ax, x, y, text, *, colour=None, size=10.0, weight="normal", **kw):
                    fontweight=weight, **kw)
 
 
-def save(fig, out_dir, name: str) -> None:
+def save(fig, out_dir, name: str, *, sources: dict | None = None) -> None:
+    """Write the figure, recording which result files it was drawn from.
+
+    `sources` maps each result file the figure read to a digest of its contents,
+    and is stored in the PNG's tEXt block, which travels with the file and
+    survives being committed. scripts/check_repository.py re-reads those files
+    and fails if a figure was drawn from a different version of results/.
+
+    Comparing the images byte for byte would not work. requirements.txt pins no
+    versions, and matplotlib renders the same figure differently between
+    releases: the committed files came from 3.10.8 and 3.11.2 produces the same
+    dimensions and the same numbers in about 20 percent fewer bytes. The digests
+    are unaffected by that, because they describe the inputs rather than the
+    pixels.
+
+    matplotlib merges this with its own defaults, so the Software entry naming
+    the version that rendered the file is still written.
+    """
     out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / f"{name}.png")
+    metadata = None if sources is None else {
+        INPUTS_KEY: json.dumps(sources, sort_keys=True)}
+    fig.savefig(out_dir / f"{name}.png", metadata=metadata)
     plt.close(fig)
     print(f"  wrote {name}.png")

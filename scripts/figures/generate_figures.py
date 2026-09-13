@@ -19,6 +19,7 @@ Output: docs/figures/
 from __future__ import annotations
 
 import csv
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -46,10 +47,27 @@ def nse(ofv):
     return 1.0 - np.asarray(ofv, dtype=float)
 
 
+#: Every result file read since the last figure was written, against a digest of
+#: its contents. Recorded here rather than listed by hand beside each figure, so
+#: that a figure which stops reading a file stops claiming it and one that starts
+#: reading a file records it without anyone remembering to.
+_READ: dict[str, str] = {}
+
+
 def need(path: Path) -> Path:
     if not path.exists():
         raise SystemExit(f"missing: {path.relative_to(ROOT).as_posix()}")
+    key = path.relative_to(ROOT).as_posix()
+    if key not in _READ:
+        _READ[key] = hashlib.sha256(path.read_bytes()).hexdigest()[:16]
     return path
+
+
+def inputs_read() -> dict[str, str]:
+    """The files read since the previous figure, and reset for the next one."""
+    out = dict(_READ)
+    _READ.clear()
+    return out
 
 
 def read_csv_cols(path: Path) -> dict[str, list[str]]:
@@ -155,7 +173,7 @@ def fig_calibration():
         "on this short, rainfall-dominated event, which says more about the event "
         "than about the stores.",
         "Source: results/assignment1_finial_gen600_atol-3/."], y=0.090)
-    ps.save(fig, OUT, "01_calibration")
+    ps.save(fig, OUT, "01_calibration", sources=inputs_read())
     return {
         "final_nse": final,
         "settled_generation": settled,
@@ -236,7 +254,7 @@ def fig_sensitivity():
         "That is what logNSE does when sampled over the full parameter range: the "
         "log of a near-zero flow diverges, and the variance decomposition goes with "
         "it. Source: results/assignment3/."], y=0.115)
-    ps.save(fig, OUT, "02_global_sensitivity")
+    ps.save(fig, OUT, "02_global_sensitivity", sources=inputs_read())
     return stats
 
 
@@ -325,7 +343,7 @@ def fig_uncertainty():
         "the loss, which is the point: if the discharge you calibrate against is "
         "wrong, fitting harder cannot tell you so.",
         "Source: results/assignment4_gen600/ and results/assignment5/."], y=0.090)
-    ps.save(fig, OUT, "03_input_vs_output_uncertainty")
+    ps.save(fig, OUT, "03_input_vs_output_uncertainty", sources=inputs_read())
     return {"baseline": ref, "a4_ref": a4_ref, "a4_recal": a4_rec,
             "a5_ref": a5_ref, "a5_recal": a5_rec}
 
@@ -406,7 +424,7 @@ def fig_rope():
         f"tightly the parameters can be pinned down.",
         "Source: results/exercise3_rope/, extracted from the Exercise 3 archive."],
         y=0.090)
-    ps.save(fig, OUT, "04_rope_threshold")
+    ps.save(fig, OUT, "04_rope_threshold", sources=inputs_read())
     return {"picked": picked, "chosen": chosen}
 
 
