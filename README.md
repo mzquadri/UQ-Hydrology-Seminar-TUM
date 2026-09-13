@@ -90,8 +90,10 @@ its range was clipped is a different finding from one that is genuinely flat.
 
 ![Sobol total-order indices under four configurations](docs/figures/02_global_sensitivity.png)
 
-Sobol variance decomposition with Saltelli sampling via `SALib`, run under two
-sampling ranges crossed with two objectives.
+Sobol variance decomposition under two sampling ranges crossed with two
+objectives. The Saltelli sampling and the index estimator are written out in
+`code/Ass_03_Global_SA_Group_B.py` on top of `scipy.stats.qmc`, following Saltelli
+et al. (2010), rather than called from a sensitivity-analysis package.
 
 | Configuration | V(Y) | Leading parameter | Sum of ST |
 |:--|:--:|:--|:--:|
@@ -118,6 +120,17 @@ rather than that the parameters are important. Taking the logarithm of a
 near-zero flow diverges, and sampling logNSE over the full range guarantees
 near-zero flows. It is reported rather than deleted.
 
+Because the estimator is the group's own rather than a library's, it is worth
+having a second symptom that does not depend on reading the same sum. A Sobol
+total-order index is bounded below by the first-order index for the same
+parameter, whatever the model, so any configuration where that fails has a
+broken estimate rather than an interesting one. Across the three configurations
+the sections above argue from, it fails for **0 of 17** parameters. In the
+discarded one it fails for **9 of 17**, the worst being a first-order index of
+1.29 against a total-order index of 0.37. `scripts/check_claims.py` checks all
+four. The raw model evaluations behind the indices are not in this repository,
+so this is a check on the published indices rather than a recomputation of them.
+
 Narrowing the sampling range shrinks the output variance by a factor of about **238**
 under NSE, from 0.463 to 0.00194.
 
@@ -129,15 +142,26 @@ Both studies generate 2,000 perturbed series, run the model with the Assignment 
 parameters, and then recalibrate against each perturbed series in turn.
 
 **Assignment 4, precipitation.** Each precipitation value is multiplied by an
-independent Gaussian factor C drawn from N(1.0, 0.083), clipped to [0.75, 1.25] so no
-value moves by more than 25%. The realised mean absolute change in precipitation is
-6.62%. Mean NSE with the reference parameters is **0.9073**, against a calibrated
-baseline of 0.9077: a loss of 0.0004. Recalibration returns 0.0002 of that, and 834
-of the 2,000 noisy series happen to score better than the unperturbed record.
+independent Gaussian factor C drawn from N(1.0, 0.083). The assignment asked for
+those multipliers to be clipped to [0.75, 1.25], and the script as submitted
+carries that clip commented out, so the run was made without it. The recorded
+mean absolute change in precipitation is 6.62%, which is 0.08 standard errors
+from what an unclipped N(1.0, 0.083) multiplier gives and 1.9 from the clipped
+version, so the numbers agree with the code. About one value in 385 moved by more
+than 25%. It changes the mean perturbation in the third decimal place and changes
+nothing below, but the run summary records the clipping as applied and it was not.
 
-That last number is the useful one. If roughly 40% of corrupted inputs produce a
-better score than the true input, then differences of this size carry no information
-about input quality.
+Mean NSE with the reference parameters is **0.9073**, against a calibrated
+baseline of 0.9077: a loss of 0.0004, and 834 of the 2,000 noisy series score
+better than the unperturbed record. Recalibration moves the mean by 0.0002, which
+`results/assignment4_gen600/uncertainty_analysis_summary.txt` declines to call
+compensation: the loss it would be compensating cannot be told from zero, and an
+improvement that size is as likely to be the optimiser finding a better optimum,
+or fitting the particular noise in each series.
+
+The 834 is the useful number of those three. If roughly 40% of corrupted inputs
+produce a better score than the true input, then differences of this size carry no
+information about input quality.
 
 **Assignment 5, discharge.** Observed water level is perturbed by an additive
 uniform draw on [-25, +25] cm, and the perturbed level is converted back to
@@ -146,9 +170,30 @@ fitting the stage-discharge data with R squared **0.9987** against 0.8831 for a
 single global power law. Mean NSE falls to **0.7592**. Not one of the 2,000 series
 scores better than the baseline, and recalibration recovers 5.76% of the loss.
 
-The asymmetry is the point of the seminar. The model can absorb noise in what drives
-it. It cannot absorb error in what it is scored against, and no amount of refitting
-will reveal that the target itself is wrong.
+The asymmetry is the point of the seminar, and it has to survive the obvious
+objection first: the two perturbations are not the same size. The precipitation
+series move by 6.62% on average and the reconstructed discharge series by
+**15.54%**, so the output was perturbed 2.35 times harder. The loss it produced
+is **356** times larger. Dividing each loss by the perturbation that produced it
+leaves error in the discharge costing about **152** times as much as error in the
+precipitation, and that division assumes the loss grows no faster than linearly
+with the perturbation; divide by the square instead, which is the least
+favourable reading, and it is still **65**. The conclusion does not rest on the
+two perturbations having been the same size.
+
+So the model can absorb noise in what drives it, and it cannot absorb error in
+what it is scored against. No amount of refitting will reveal that the target
+itself is wrong.
+
+One qualification on what absorbing means here. The precipitation multiplier is
+drawn independently for every hour, so the perturbation is uncorrelated in time
+and a large part of it cancels when the model integrates rainfall across the
+event. Real rainfall error is not like that: gauge undercatch and the gap between
+a point measurement and a catchment average persist across a storm. The run
+summary makes the same point when it compares this design against Oudin et al.
+(2006), who perturbed inputs with bias as well as noise. Assignment 4 shows that
+the model absorbs uncorrelated rainfall noise. It does not test a systematic
+error, and the result should not be read as though it did.
 
 ## Exercises
 
@@ -192,8 +237,11 @@ specific about the difference:
 
 - Every number in this README is checked against the files in `results/` by
   `python scripts/check_claims.py`, which fails if the two disagree. Every figure is
-  generated from those same files by `scripts/figures/generate_figures.py`, so a
-  figure cannot show a value the runs did not produce.
+  generated from those same files by `scripts/figures/generate_figures.py`, and
+  records which of them it read; `scripts/check_repository.py` re-reads those files
+  and fails if a figure was drawn from an older version of `results/`. So a figure
+  cannot show a value the runs did not produce, and cannot quietly go on showing
+  one the runs no longer produce.
 - The full scientific reruns cannot be reproduced from this repository alone. The
   forcing and area inputs and the course-provided `hmg` package containing `HBV001A`
   are not included, and Assignments 1 to 4 need them.
@@ -205,6 +253,16 @@ specific about the difference:
   against the rating-curve reconstruction of the unperturbed record, distinct from
   the 0.9077 measured against the original observations. The gap is the rating curve
   fit itself, before any perturbation is applied.
+- The 2,000 perturbed series behind Assignments 4 and 5 cannot be regenerated even
+  with the course data. Both scripts draw their perturbations through the global
+  `np.random` functions, with a seeded generator commented out on the line above,
+  so the "Random seed: 42" each summary records governs the recalibration searches
+  and not the perturbations. The statistics of the draws are reproducible; the
+  particular 2,000 series are not.
+- Assignment 4's summary file states the perturbation as `C = N(1, 0.05)` in its
+  closing discussion of Oudin et al. while the run used N(1.0, 0.083), which is
+  what the configuration block and every derived number in the same file say. It
+  is left as it was written rather than edited after the fact.
 
 ## Reproducing what can be reproduced
 
@@ -225,11 +283,22 @@ git clone --config core.longpaths=true https://github.com/mzquadri/UQ-Hydrology-
 Checks and figures, none of which need the course data:
 
 ```bash
-python scripts/check_repository.py             # artifacts present and code parses
-python scripts/extract_exercise3_summaries.py  # ROPE summaries out of the archive
+python scripts/check_repository.py             # artifacts, code parses, figures match results/
 python scripts/check_claims.py                 # README numbers against results/
 python scripts/figures/generate_figures.py     # regenerate docs/figures/
+python scripts/figures/generate_diagram.py     # regenerate docs/diagrams/workflow.svg
 ```
+
+Those four are the checks continuous integration runs, alongside the linter. One
+more needs the Exercise 3 archive rather than the course data, so it works only
+after `git lfs pull`:
+
+```bash
+python scripts/extract_exercise3_summaries.py  # ROPE summaries out of the archive
+```
+
+Its output is already committed under `results/exercise3_rope/`, which is why the
+checks above pass on a clone that never fetched the 2.1 GB archive.
 
 Re-running the assignments themselves additionally needs the course inputs and the
 `hmg` package, located through environment variables rather than by editing source:
@@ -254,7 +323,7 @@ results/                 Run outputs, one directory per assignment
   Ex 2 parallel DREAM-*  Exercise 2 archive (Git LFS, 372 MB)
 docs/figures/            Figures, generated from results/
 docs/diagrams/           Workflow overview
-scripts/                 Checks and figure generation
+scripts/                 Checks, figure generation, workflow diagram
 Overleaf_Projects/       LaTeX report source and figures
 ```
 

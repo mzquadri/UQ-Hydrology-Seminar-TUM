@@ -74,6 +74,27 @@ def sobol(folder: str) -> dict[str, float]:
     }
 
 
+def csv_rows(path: Path) -> list[dict]:
+    with need_csv(path).open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def need_csv(path: Path) -> Path:
+    if not path.is_file():
+        raise SystemExit(f"missing: {path.relative_to(ROOT).as_posix()}")
+    return path
+
+
+def bounds_violations(folder: str, tolerance: float = 1e-6) -> int:
+    """Parameters whose first-order index exceeds their total-order index.
+
+    S1 <= ST holds for any model, so a positive count is a property of the
+    estimate rather than of the hydrology.
+    """
+    rows = csv_rows(A3 / folder / "sobol_indices_corrected.csv")
+    return sum(1 for r in rows if float(r["S1"]) > float(r["ST"]) + tolerance)
+
+
 def build_claims() -> list[tuple[str, str]]:
     """Every claim as (description, a regex the README must match).
 
@@ -123,6 +144,22 @@ def build_claims() -> list[tuple[str, str]]:
         rf"`{narrow_log['top_name']}` \({narrow_log['top_st']:.2f}\) \| "
         rf"{narrow_log['sum_st']:.3f}")
     add("broken logNSE sum of S1", rf"they sum to {full_log['sum_s1']:.2f}")
+
+    # A total-order Sobol index is bounded below by the first-order index for the
+    # same parameter. The estimator here is the group's own rather than a
+    # library's, so this is worth testing directly: it is a second symptom of the
+    # breakdown in the discarded configuration, independent of the sum of S1 the
+    # README reads it from, and it is a check on the three that are used.
+    sound = sum(bounds_violations(f) for f in
+                ("Assignment3_Results_full_range_nse", "Assignment3_narrow_NSE",
+                 "Assignment3_narrow_logNSE"))
+    broken = bounds_violations("Assignment3_Results_full_range_lognse_problematic")
+    total = len(list((A3 / "Assignment3_narrow_NSE").glob("*")) and
+                csv_rows(A3 / "Assignment3_narrow_NSE" / "sobol_indices_corrected.csv"))
+    add("sound configurations respect ST >= S1",
+        rf"it fails for \*\*{sound} of {total}\*\* parameters")
+    add("the discarded configuration does not",
+        rf"it fails for \*\*{broken} of {total}\*\*")
     ratio = full_nse["variance"] / narrow_nse["variance"]
     add("full/narrow variance ratio", rf"factor of about \*\*{ratio:.0f}\*\*")
 
@@ -158,11 +195,50 @@ def build_claims() -> list[tuple[str, str]]:
     r2_two = float(re.search(r"Final R.\s*=\s*([\d.]+)", fit).group(1))
     r2_one = float(re.search(r"R.\s*=\s*([\d.]+)\s*RMSE", fit).group(1))
     add("water level perturbation", rf"\[-{lo5}, \+{hi5}\] cm")
+
+    # The two perturbations are not the same size, and the asymmetry the seminar
+    # concludes with is only readable once that is said. Both changes are
+    # recorded by the runs; the ratio below divides each loss by the perturbation
+    # that produced it, so the comparison does not rest on them being equal.
+    ppt_change = float(re.search(
+        r"Mean Absolute Relative PPT Change:\s*Mean:\s*([\d.]+)%", text4).group(1))
+    dis_change = float(re.search(
+        r"Mean Absolute Relative DIS Change:\s*Mean:\s*([\d.]+)%", text5).group(1))
+    ref_ofv = labelled(a4_summary, "Reference OFV")
+    loss4 = labelled(a4_summary, "OFV mean") - ref_ofv
+    loss5 = labelled(a5_summary, "OFV mean") - ref_ofv
+    add("mean absolute discharge change",
+        rf"discharge series by \*\*{dis_change}%\*\*")
+    add("relative size of the two perturbations",
+        rf"perturbed {dis_change / ppt_change:.2f} times harder")
+    ratio = dis_change / ppt_change
+    add("raw ratio of the two losses", rf"\*\*{loss5 / loss4:.0f}\*\* times larger")
+    add("loss per unit of perturbation",
+        rf"about \*\*{(loss5 / dis_change) / (loss4 / ppt_change):.0f}\*\* times as much")
+    add("loss per squared unit of perturbation",
+        rf"still \*\*{(loss5 / loss4) / ratio ** 2:.0f}\*\*")
     add("rating curve R squared", rf"R squared \*\*{r2_two:.4f}\*\*")
     add("single power law R squared", rf"against {r2_one:.4f} for a")
     add("rating-curve-error mean NSE", rf"Mean NSE falls to \*\*{a5_ref:.4f}\*\*")
     add("loss recovered by recalibration", rf"recovers {recovered}% of the loss")
     add("rating curve reconstruction NSE", rf"\"calculated NSE\" of {float(calc):.4f}")
+
+    # --- What the perturbation code actually does
+    #
+    # The README used to say the multipliers were clipped to [0.75, 1.25]. They
+    # are not: the clip is commented out in the script as submitted, and the
+    # recorded mean absolute change matches an unclipped draw. This pins both
+    # halves, so re-enabling the clip without correcting the README fails here.
+    perturb = read_text(ROOT / "code" / "Ass_04_Input_Uncertainty_Group_B.py")
+    clip_line = re.search(r"^(\s*)(#?)\s*multipliers = np\.clip\(multipliers",
+                          perturb, re.M)
+    if clip_line is None:
+        raise SystemExit("the multiplier clip line is gone from Assignment 4's script")
+    if clip_line.group(2) != "#":
+        raise SystemExit(
+            "Assignment 4's script now clips the multipliers, which the recorded "
+            "run did not. Update README.md and this check together.")
+    add("multipliers were not clipped", r"carries that clip commented out")
 
     # --- Exercise 3, only once the summaries have been extracted
     if (ROPE / "hbv_daily_1971_1980_cb" / "420_rope_selected_threshold.txt").is_file():
