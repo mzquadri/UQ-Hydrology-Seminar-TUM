@@ -5,7 +5,11 @@ scipy
 matplotlib
 joblib
 scikit-learn
-SALib
+
+# SALib was listed here for the Sobol analysis of Assignment 3. That analysis
+# does not use it: the Saltelli sampling and the index estimator are written out
+# in code/Ass_03_Global_SA_Group_B.py on scipy.stats.qmc. No file in this
+# repository imports SALib, in the current tree or anywhere in its history.
 
 # The HBV001A implementation is imported as `hmg` by Assignments 1-4.
 # It is course-provided and not redistributed in this repository.
