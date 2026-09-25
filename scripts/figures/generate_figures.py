@@ -54,12 +54,26 @@ def nse(ofv):
 _READ: dict[str, str] = {}
 
 
+def content_digest(path: Path) -> str:
+    """A digest of what the file says, not of how the checkout spelled it.
+
+    The result files are text. Git hands a Windows checkout CRLF and a Linux one
+    LF for the same committed bytes, so hashing the working tree directly makes
+    the digest a property of the machine. A figure regenerated on Windows then
+    fails this check in CI, which is a false alarm about provenance and says
+    nothing about whether the figure is current.
+
+    `check_repository.py` normalises the same way. If one side changes, both must.
+    """
+    return hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:16]
+
+
 def need(path: Path) -> Path:
     if not path.exists():
         raise SystemExit(f"missing: {path.relative_to(ROOT).as_posix()}")
     key = path.relative_to(ROOT).as_posix()
     if key not in _READ:
-        _READ[key] = hashlib.sha256(path.read_bytes()).hexdigest()[:16]
+        _READ[key] = content_digest(path)
     return path
 
 

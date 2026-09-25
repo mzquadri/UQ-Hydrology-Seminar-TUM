@@ -86,7 +86,14 @@ def check_figures() -> list[str]:
             if not source.is_file():
                 failures.append(f"{figure.name} was drawn from {name}, which is gone")
                 continue
-            now = hashlib.sha256(source.read_bytes()).hexdigest()[:len(digest)]
+            # Normalised, because the result files are text and a Windows
+            # checkout spells the same committed bytes with CRLF. Hashing the
+            # working tree raw makes this a test of the platform rather than of
+            # whether the figure is current: a figure regenerated on Windows
+            # failed here in CI for that reason alone. generate_figures.py
+            # normalises the same way, and if one side changes both must.
+            content = source.read_bytes().replace(b"\r\n", b"\n")
+            now = hashlib.sha256(content).hexdigest()[:len(digest)]
             if now != digest:
                 failures.append(
                     f"{figure.name} was drawn from an older {name}; "
