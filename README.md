@@ -198,19 +198,29 @@ error, and the result should not be read as though it did.
 ## Exercises
 
 Three exercises sit alongside the five assignments. They use different models and
-tools, and their material is archived rather than laid out in the tree.
+tools, and the bulk of their output is archived rather than laid out in the tree.
 
 **Exercise 1** is a notebook, `code/EX1/EX1_MMUQ_Group_B.ipynb`, committed by Yihan
 Shen.
 
 **Exercise 2** is a groundwater problem rather than a rainfall-runoff one: a
-MODFLOW-2005 flood and river model driven by SPOTPY's parallel DREAM sampler,
-`results/Ex 2 parallel DREAM-20260111.zip`. DREAM is an adaptive Markov chain Monte
-Carlo method, so this is the Bayesian counterpart to the point-estimate calibration
-of Assignment 1. It was run across four MPI ranks, and the archive holds the setup
-(`spot_setup_modflow.py`, `run_dream.py`), the per-rank model directories, and
-posterior parameter uncertainty plots for the Alzpitz, B1, B3 and B4 observation
-points.
+MODFLOW-2005 flood and river model driven by SPOTPY's parallel DREAM sampler. DREAM
+is an adaptive Markov chain Monte Carlo method, so this is the Bayesian counterpart
+to the point-estimate calibration of Assignment 1. It was run across four MPI ranks.
+
+The exercise itself is in the tree. `code/EX2/` holds the setup and the sampler
+(`spot_setup_modflow.py`, `run_dream.py`, `visualization.py`), the MODFLOW notebook
+and the observations; `results/EX2/` holds the chain SPOTPY wrote,
+`DREAM_modflow.csv`, and the posterior parameter-uncertainty plots for the Alzpitz,
+B1, B3 and B4 observation points.
+
+What is not in the tree is the run directory: roughly 3.5 GB of MODFLOW solver
+output, written once per MPI rank plus the base run, five near-identical copies of
+the same `flood.rch`, `heads.dat` and `output.dat`. That, together with the input
+decks needed to re-run the model and the USGS `mf2005` and `mt3dms5b` binaries, is
+the **[`ex2-dream-run-v1`](https://github.com/mzquadri/UQ-Hydrology-Seminar-TUM/releases/tag/ex2-dream-run-v1)**
+release asset, 372 MB. Same treatment as Exercise 3 below: the conclusions can be
+read without downloading the archive.
 
 **Exercise 3** applies ROPE, robust parameter estimation by data depth, to daily HBV
 runs for catchment 420 over two decades.
@@ -317,21 +327,26 @@ curve-fitting script.
 ```
 code/                    Assignment scripts, one per assignment
   EX1/                   Exercise 1 notebook
+  EX2/                   Exercise 2 DREAM setup, sampler and observations
   EX3/                   Exercise 3 archive (Git LFS, 2.1 GB)
 results/                 Run outputs, one directory per assignment
   exercise3_rope/        ROPE summaries extracted from the archive
-  Ex 2 parallel DREAM-*  Exercise 2 archive (Git LFS, 372 MB)
+  EX2/                   Exercise 2 MCMC chain and its figures
 docs/figures/            Figures, generated from results/
 docs/diagrams/           Workflow overview
 scripts/                 Checks, figure generation, workflow diagram
 Overleaf_Projects/       LaTeX report source and figures
 ```
 
-Two archives are tracked with [Git LFS](https://git-lfs.github.com/):
-`code/EX3/rope_exercise3_pycodes_Final.zip` at 2.1 GB and
-`results/Ex 2 parallel DREAM-20260111.zip` at 372 MB. Cloning without Git LFS
-installed leaves them as pointer files; everything else in the repository still
+One archive is tracked with [Git LFS](https://git-lfs.github.com/):
+`code/EX3/rope_exercise3_pycodes_Final.zip` at 2.1 GB. Cloning without Git LFS
+installed leaves it as a pointer file; everything else in the repository still
 works, including the figures.
+
+The Exercise 2 run directory was tracked the same way until it was moved to the
+[`ex2-dream-run-v1`](https://github.com/mzquadri/UQ-Hydrology-Seminar-TUM/releases/tag/ex2-dream-run-v1)
+release. Dropping the pointer does not reclaim the object already in GitHub's LFS
+storage; that would need a history rewrite, which has not been done.
 
 ## References
 
