@@ -1,0 +1,11 @@
+# check_claims.py hashes the forcing CSV and compares it with the SHA-256 in
+# README.md. Git's default autocrlf on Windows rewrites LF to CRLF on checkout,
+# which changes those bytes and fails the check on Windows clones only.
+#
+# The model output depends on it too: a CRLF file still parses, but the hash in
+# the README would no longer describe the file that produced the benchmark.
+*.csv   text eol=lf
+*.json  text eol=lf
+*.pyx   text eol=lf
+*.py    text eol=lf
+*.md    text eol=lf

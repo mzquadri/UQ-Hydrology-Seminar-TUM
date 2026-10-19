@@ -1,0 +1,12 @@
+# Toolchain for building and benchmarking the extension.
+# Exists because the parity test and the benchmark need a C compiler, and
+# pinning the image makes the recorded numbers reproducible.
+FROM python:3.11-slim
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir "cython==3.1.1" "numpy==2.2.6" "setuptools==80.9.0" "pytest==8.4.1"
+
+WORKDIR /work

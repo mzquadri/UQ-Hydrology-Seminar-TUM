@@ -1,0 +1,18 @@
+{
+  "timesteps": 12275,
+  "repeats": 9,
+  "statistic": "best of N, see module docstring",
+  "python_seconds": 0.099512,
+  "cython_seconds": 0.000877,
+  "speedup": 113.49,
+  "python_us_per_step": 8.1069,
+  "cython_us_per_step": 0.0714,
+  "outputs_bit_identical": true,
+  "environment": {
+    "python": "3.11.17",
+    "implementation": "CPython",
+    "machine": "x86_64",
+    "system": "Linux",
+    "numpy": "2.2.6"
+  }
+}
