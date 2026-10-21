@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import platform
 import sys
 import time
@@ -24,6 +25,32 @@ from pathlib import Path
 import numpy as np
 
 import hbv_python as py
+
+
+def cpu_model_name() -> str:
+    """The CPU this ran on, or "unknown" if the platform will not say.
+
+    Recorded because a speedup is a ratio between two machines' worth of work,
+    and without the machine the ratio cannot be explained. This repository has
+    the case in hand: the same code measured 113.49x on one host and 45x to 51x
+    on another, almost entirely because the pure-Python side ran three times
+    faster on the second. `platform.machine()` says "x86_64" on both and
+    settles nothing.
+
+    pyperf, the CPython benchmarking tool, records `cpu_model_name` and
+    `cpu_count` in its run metadata for the same reason; this is the same two
+    fields, without the dependency.
+    """
+    try:
+        with open("/proc/cpuinfo", encoding="utf-8") as fh:
+            for line in fh:
+                if line.startswith("model name"):
+                    return line.split(":", 1)[1].strip()
+    except OSError:
+        pass
+    # Windows fills this in; Linux usually repeats the architecture, which the
+    # /proc read above has already improved on, and macOS returns "arm".
+    return platform.processor() or "unknown"
 
 
 def best_of(fn, repeats: int) -> float:
@@ -101,6 +128,8 @@ def main(argv: list[str] | None = None) -> int:
             "machine": platform.machine(),
             "system": platform.system(),
             "numpy": np.__version__,
+            "cpu_model_name": cpu_model_name(),
+            "cpu_count": os.cpu_count(),
         },
     }
 

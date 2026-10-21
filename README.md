@@ -195,6 +195,25 @@ summary makes the same point when it compares this design against Oudin et al.
 the model absorbs uncorrelated rainfall noise. It does not test a systematic
 error, and the result should not be read as though it did.
 
+## A Cython HBV core loop
+
+[`cython_hbv/`](cython_hbv/) is a later addition and not part of the seminar
+work. It is an HBV implementation written twice, in pure Python and in Cython,
+producing **bit-identical** discharge over 12,275 daily timesteps with the Cython
+version one to two orders of magnitude faster: 113.49x on the host that produced
+the committed record, 45x to 57x on a second one. The spread is almost entirely
+on the pure-Python side, so the ratio describes a pair of machines rather than
+this code; the bit-identical agreement is the part that holds everywhere.
+
+It exists as a separate implementation rather than as an optimisation of the
+assignment code because **the course's `hmg` package is not in this repository
+and is not redistributable**, so there is no HBV source here to speed up. The
+model follows the published HBV-light structure (Seibert and Vis, 2012) and is
+driven by open DWD observations for Munich, cited with their licence and
+retrieval date. It is **not calibrated** and its discharge is not a prediction
+of anything; the point is a deterministic loop that two implementations must
+agree on exactly.
+
 ## Exercises
 
 Three exercises sit alongside the five assignments. They use different models and

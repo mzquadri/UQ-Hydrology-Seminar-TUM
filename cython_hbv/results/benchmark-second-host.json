@@ -1,0 +1,20 @@
+{
+  "timesteps": 12275,
+  "repeats": 7,
+  "statistic": "best of N, see module docstring",
+  "python_seconds": 0.05517,
+  "cython_seconds": 0.000971,
+  "speedup": 56.8,
+  "python_us_per_step": 4.4945,
+  "cython_us_per_step": 0.0791,
+  "outputs_bit_identical": true,
+  "environment": {
+    "python": "3.11.17",
+    "implementation": "CPython",
+    "machine": "x86_64",
+    "system": "Linux",
+    "numpy": "2.2.6",
+    "cpu_model_name": "11th Gen Intel(R) Core(TM) i7-1165G7 @ 2.80GHz",
+    "cpu_count": 8
+  }
+}

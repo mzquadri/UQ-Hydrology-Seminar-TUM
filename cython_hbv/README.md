@@ -2,7 +2,8 @@
 
 A conceptual HBV rainfall-runoff model written twice: once in pure Python, once
 in Cython. The two produce **bit-identical** discharge over 12,275 real daily
-timesteps, and the Cython version runs **113x** faster.
+timesteps, and the Cython version runs **one to two orders of magnitude**
+faster, measured at 113.49x on one machine and 45x to 57x on another.
 
 ```
 timesteps          12275
@@ -15,6 +16,31 @@ bit-identical      True
 Measured output in [`results/benchmark.json`](results/benchmark.json), produced
 by [`benchmark.py`](benchmark.py). Python 3.11.17, NumPy 2.2.6, x86_64 Linux,
 best of 9 repetitions.
+
+### The ratio is a property of two machines, not of this code
+
+Re-running the same container on a different host gives
+[`results/benchmark-second-host.json`](results/benchmark-second-host.json):
+56.80x, on an 11th Gen Intel Core i7-1165G7. Three runs there landed at 45.49x,
+51.41x and 56.80x.
+
+Almost all of that spread is on the pure-Python side, which moved between 31.74
+and 99.51 ms while the Cython side stayed near 0.07 to 0.08 us per timestep. The
+Cython loop is doing the same arithmetic on both hosts; what changes is how
+expensive the interpreter's version of it is, and that depends on the CPU, its
+clock and what else is competing for it.
+
+So **a single speedup figure is not reproducible and should not be read as a
+property of this code**. The per-timestep cost is the more stable number, and
+bit-identical agreement, which is what the parity tests actually assert, holds
+on every host regardless.
+
+`benchmark.py` now records `cpu_model_name` and `cpu_count` alongside the
+timings, so a future reading can be explained rather than merely disagreed
+with. Those are the two fields
+[pyperf](https://pyperf.readthedocs.io/), the CPython benchmarking tool, keeps
+in its run metadata, for the same reason. The original record predates that
+field and carries only `x86_64`, which is why its host cannot now be identified.
 
 ## Why the model is written here rather than ported
 
