@@ -41,6 +41,11 @@ REQUIRED = (
     "code/Ass_05_fittingCurve_Group_B.py",
     "results/assignment1_finial_gen600_atol-3/optimization_gen_summary.csv",
     "results/assignment3/Assignment3_narrow_NSE/sobol_indices_corrected.csv",
+    # Both themes of the workflow diagram, which the README serves through a <picture>.
+    # The CI step that regenerates them catches a *changed* file but not a deleted one:
+    # the generator would recreate it as untracked and `git diff` would report nothing.
+    "docs/diagrams/workflow.svg",
+    "docs/diagrams/workflow-dark.svg",
     "Overleaf_Projects/Mathematical methods for uncertainty quantification"
     " in hydrology/main.tex",
 )
