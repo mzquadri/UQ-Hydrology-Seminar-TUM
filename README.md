@@ -16,6 +16,48 @@ fit essentially untouched. Propagating realistic rating-curve error into the
 observed discharge costs about 0.15 of Nash-Sutcliffe efficiency, and recalibrating
 the model against the corrupted record wins back almost none of it.
 
+## The chain, in one picture
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/workflow-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/diagrams/workflow.svg">
+  <img src="docs/diagrams/workflow.svg" alt="The seminar chain: forcing and the HBV001a model, calibration by differential evolution, process turn-off, local and global sensitivity, then precipitation error against rating-curve error, with the measured NSE at each step">
+</picture>
+
+Every number in it is read out of `results/` by
+[`scripts/figures/generate_diagram.py`](scripts/figures/generate_diagram.py), and CI
+regenerates both files and fails if either differs by a byte. An earlier hand-drawn
+version had drifted: it stated a 5% precipitation noise level where the runs used a
+multiplier standard deviation of 0.083, and a 15 cm water level perturbation where they
+used 25 cm.
+
+The same chain as text, which is what renders if the images do not:
+
+```mermaid
+flowchart TB
+    F["forcing<br/>temperature, precipitation, PET"] --> M["HBV001a<br/>lumped, hourly, 18 parameters"]
+    M --> C["<b>Assignment 1</b><br/>differential evolution<br/>best NSE 0.9076"]
+    C --> T["process turn-off<br/>lower reservoir is load-bearing<br/>groundwater is not, on this event"]
+
+    C --> L["<b>Assignment 2</b><br/>local sensitivity<br/>one parameter at a time"]
+    C --> G["<b>Assignment 3</b><br/>global sensitivity<br/>Sobol, Saltelli sampling"]
+
+    C --> P["<b>Assignment 4</b><br/>error in the <b>input</b><br/>rainfall multiplier, sd 0.083"]
+    C --> R["<b>Assignment 5</b><br/>error in the <b>output</b><br/>rating curve, 25 cm on water level"]
+
+    P --> PR["NSE 0.9073<br/>essentially untouched"]
+    R --> RR["NSE 0.7592<br/>and recalibration wins back almost none"]
+
+    linkStyle 0,1,2 stroke:#2563EB
+    linkStyle 3,4 stroke:#D97706
+    linkStyle 5,7 stroke:#059669
+    linkStyle 6,8 stroke:#DC2626
+```
+
+The two bottom branches are the finding: perturbing the rainfall that drives the model
+costs almost nothing, and perturbing the discharge it is scored against costs about 0.15
+of NSE. The weak point is the observations, not the forcing.
+
 ## Authorship
 
 This is a three-person group submission, and the work is joint. What the git

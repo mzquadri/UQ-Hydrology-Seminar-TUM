@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 700" width="980" height="700" font-family="Segoe UI, -apple-system, Helvetica, Arial, sans-serif">
+  <rect width="980" height="700" fill="#0D1117"/>
+  <defs><style>
+    .h { fill:#E6EDF3; font-size:19px; font-weight:600; }
+    .s { fill:#9FB1C1; font-size:12.5px; }
+    .lbl { fill:#E6EDF3; font-size:13.5px; font-weight:600; }
+    .sub { fill:#9FB1C1; font-size:11px; }
+    .cap { fill:#7D8590; font-size:11px; }
+  </style></defs>
+  <text class="h" x="30" y="36" text-anchor="start">Uncertainty quantification in hydrology: the seminar chain</text>
+  <text class="s" x="30" y="58" text-anchor="start">One calibrated model, then four ways of asking how much of its skill is real.</text>
+  <rect x="30" y="86" width="250" height="92" rx="9" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <text class="lbl" x="45" y="111">Forcing and model</text>
+  <text class="sub" x="45" y="132" text-anchor="start">temperature, precipitation, PET</text>
+  <text class="sub" x="45" y="149" text-anchor="start">HBV001a, lumped rainfall-runoff</text>
+  <text class="sub" x="45" y="166" text-anchor="start">hourly, 18 parameters</text>
+  <line x1="285" y1="132" x2="327.0" y2="132.0" stroke="#7D8590" stroke-width="1.6"/>
+  <polygon points="335,132 327.0,136.4 327.0,127.6" fill="#7D8590"/>
+  <rect x="340" y="86" width="280" height="92" rx="9" fill="#0D2847" stroke="#58A6FF" stroke-width="1.4"/>
+  <text class="lbl" x="355" y="111">Assignment 1, calibration</text>
+  <text class="sub" x="355" y="132" text-anchor="start">differential evolution on the objective</text>
+  <text class="sub" x="355" y="149" text-anchor="start">419 generations</text>
+  <text class="sub" x="355" y="166" text-anchor="start">best NSE 0.9076</text>
+  <line x1="625" y1="132" x2="667.0" y2="132.0" stroke="#7D8590" stroke-width="1.6"/>
+  <polygon points="675,132 667.0,136.4 667.0,127.6" fill="#7D8590"/>
+  <rect x="680" y="86" width="270" height="92" rx="9" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <text class="lbl" x="695" y="111">Process turn-off</text>
+  <text class="sub" x="695" y="132" text-anchor="start">each store disabled in turn</text>
+  <text class="sub" x="695" y="149" text-anchor="start">lower reservoir is load-bearing</text>
+  <text class="sub" x="695" y="166" text-anchor="start">groundwater is not, on this event</text>
+  <line x1="480" y1="184" x2="480.0" y2="210.0" stroke="#7D8590" stroke-width="1.6"/>
+  <polygon points="480,218 475.6,210.0 484.4,210.0" fill="#7D8590"/>
+  <text class="lbl" x="30" y="214" text-anchor="start">Which parameters matter, and where you ask from</text>
+  <rect x="30" y="232" width="440" height="86" rx="9" fill="#2D2410" stroke="#D29922" stroke-width="1.4"/>
+  <text class="lbl" x="45" y="257">Assignment 2, local sensitivity</text>
+  <text class="sub" x="45" y="278" text-anchor="start">one parameter at a time, plus and minus 30%</text>
+  <text class="sub" x="45" y="295" text-anchor="start">near the optimum sl0_fcy leads</text>
+  <rect x="510" y="232" width="440" height="86" rx="9" fill="#2D2410" stroke="#D29922" stroke-width="1.4"/>
+  <text class="lbl" x="525" y="257">Assignment 3, global sensitivity</text>
+  <text class="sub" x="525" y="278" text-anchor="start">Sobol indices, Saltelli sampling</text>
+  <text class="sub" x="525" y="295" text-anchor="start">over the full range lrr_dre leads, total-order 0.59</text>
+  <line x1="480" y1="324" x2="480.0" y2="350.0" stroke="#7D8590" stroke-width="1.6"/>
+  <polygon points="480,358 475.6,350.0 484.4,350.0" fill="#7D8590"/>
+  <text class="lbl" x="30" y="354" text-anchor="start">How much of the skill survives error in the data</text>
+  <rect x="30" y="372" width="440" height="100" rx="9" fill="#0D2818" stroke="#3FB950" stroke-width="1.4"/>
+  <text class="lbl" x="45" y="397">Assignment 4, input uncertainty</text>
+  <text class="sub" x="45" y="418" text-anchor="start">2,000 precipitation series, multiplier N(1.0, 0.083)</text>
+  <text class="sub" x="45" y="435" text-anchor="start">mean absolute change 6.62%</text>
+  <text class="sub" x="45" y="452" text-anchor="start">NSE 0.9077 to 0.9073, essentially unchanged</text>
+  <rect x="510" y="372" width="440" height="100" rx="9" fill="#2D1214" stroke="#F85149" stroke-width="1.4"/>
+  <text class="lbl" x="525" y="397">Assignment 5, output uncertainty</text>
+  <text class="sub" x="525" y="418" text-anchor="start">2,000 discharge series, water level plus or minus 25 cm</text>
+  <text class="sub" x="525" y="435" text-anchor="start">rating curve, two power laws blended by a sigmoid</text>
+  <text class="sub" x="525" y="452" text-anchor="start">NSE 0.9077 to 0.7592</text>
+  <line x1="480" y1="478" x2="480.0" y2="504.0" stroke="#7D8590" stroke-width="1.6"/>
+  <polygon points="480,512 475.6,504.0 484.4,504.0" fill="#7D8590"/>
+  <rect x="30" y="526" width="920" height="76" rx="9" fill="#161B22" stroke="#30363D" stroke-width="1.4"/>
+  <text class="lbl" x="45" y="551">What the sequence shows</text>
+  <text class="sub" x="45" y="572" text-anchor="start">Error in the observed discharge costs roughly 0.15 of NSE; error in the rainfall costs 0.0004.</text>
+  <text class="sub" x="45" y="589" text-anchor="start">Recalibrating against the corrupted discharge recovers 5.76% of the loss, so fitting harder cannot reveal that the target is wrong.</text>
+  <text class="cap" x="30" y="632" text-anchor="start">Exercise 2 calibrates a MODFLOW groundwater model with parallel DREAM; Exercise 3 applies ROPE over two decades of daily HBV runs.</text>
+  <text class="cap" x="30" y="652" text-anchor="start">Generated by scripts/figures/generate_diagram.py from the files in results/.</text>
+</svg>
